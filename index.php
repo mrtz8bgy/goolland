@@ -1,6 +1,7 @@
 <?php
 
 require_once "includes/db.php";
+ //این دیتابیس هنوز ساخته نشده  
 
 $settings = $conn->query("SELECT * FROM settings LIMIT 1")->fetch_assoc();
 

@@ -423,14 +423,6 @@ function fetchData(url, options = {}) {
 
 // Cart Functions
 function addToCart(productId, quantity = 1, button = null) {
-    const isLoggedIn = <?php echo isLoggedIn() ? 'true' : 'false'; ?>;
-    
-    if (!isLoggedIn) {
-        alert('برای افزودن به سبد خرید، ابتدا وارد حساب کاربری شوید');
-        window.location.href = 'login.php?redirect=' + encodeURIComponent(window.location.href);
-        return Promise.reject('Not logged in');
-    }
-    
     if (button) {
         const originalText = button.innerHTML;
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> در حال اضافه کردن...';
@@ -461,7 +453,11 @@ function addToCart(productId, quantity = 1, button = null) {
             } else {
                 button.innerHTML = originalText;
                 button.disabled = false;
-                alert(data.message || 'خطا در افزودن به سبد خرید');
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else {
+                    alert(data.message || 'خطا در افزودن به سبد خرید');
+                }
             }
         }
         
@@ -487,14 +483,6 @@ function removeFromCart(cartId) {
 
 // Wishlist Functions
 function addToWishlist(productId, button = null) {
-    const isLoggedIn = <?php echo isLoggedIn() ? 'true' : 'false'; ?>;
-    
-    if (!isLoggedIn) {
-        alert('برای افزودن به علاقه‌مندی‌ها، ابتدا وارد حساب کاربری شوید');
-        window.location.href = 'login.php?redirect=' + encodeURIComponent(window.location.href);
-        return Promise.reject('Not logged in');
-    }
-    
     if (button) {
         const originalHTML = button.innerHTML;
         button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
@@ -522,7 +510,11 @@ function addToWishlist(productId, button = null) {
                 wishlistCountEl.style.display = 'inline-block';
             }
         } else {
-            alert(data.message || 'خطا در افزودن به علاقه‌مندی‌ها');
+            if (data.redirect) {
+                window.location.href = data.redirect;
+            } else {
+                alert(data.message || 'خطا در افزودن به علاقه‌مندی‌ها');
+            }
         }
         
         return data;
@@ -538,12 +530,6 @@ function addToWishlist(productId, button = null) {
 }
 
 function removeFromWishlist(productId, button = null) {
-    const isLoggedIn = <?php echo isLoggedIn() ? 'true' : 'false'; ?>;
-    
-    if (!isLoggedIn) {
-        return Promise.reject('Not logged in');
-    }
-    
     return fetchData('includes/wishlist.php?action=remove&product_id=' + productId)
     .then(data => {
         if (data.success) {
@@ -588,8 +574,7 @@ function submitContactForm(formData) {
 
 // Product Quick View
 function showQuickView(productId) {
-    // This function can be extended to show a modal with product details
-    window.location.href = 'product.php?id=' + productId;
+    window.location.href = 'product.php?slug=' + productId;
 }
 
 // Image Zoom

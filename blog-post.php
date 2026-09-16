@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'includes/config.php';
+require_once "includes/db.php";';
 
 // Get post slug
 $slug = isset($_GET['slug']) ? sanitizeInput($_GET['slug']) : '';

@@ -1,0 +1,94 @@
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# PHP
+*.log
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Database
+*.sql
+*.sql.gz
+*.sql.bz2
+
+# Images (keep directory, ignore contents)
+assets/images/products/*
+!assets/images/products/.gitkeep
+assets/images/categories/*
+!assets/images/categories/.gitkeep
+assets/images/articles/*
+!assets/images/articles/.gitkeep
+
+# Uploads
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.svg
+
+# Logs
+*.log
+logs/
+
+# Cache
+*.cache
+cache/
+
+# Session
+session/
+sessions/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Composer
+vendor/
+composer.lock
+
+# Node.js
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Build files
+dist/
+build/
+*.min.css
+*.min.js
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Configuration files with sensitive data
+config.php
+config/*.php
+
+# PHPUnit
+.phpunit.result.cache
+phpunit.xml
+
+# OS specific files
+Desktop.ini
+.desktop

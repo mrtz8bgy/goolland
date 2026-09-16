@@ -21,7 +21,7 @@ $categories = getAllCategories();
 $banners = getBannersByPosition('home');
 
 // Get testimonials (from reviews)
-$stmt = $pdo->query("SELECT r.*, u.name as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id WHERE r.is_approved = 1 AND r.rating >= 4 ORDER BY RAND() LIMIT 4");
+$stmt = $pdo->query("SELECT r.*, COALESCE(NULLIF(r.author_name, ''), NULLIF(CONCAT_WS(' ', u.first_name, u.last_name), ''), 'مشتری') as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id WHERE r.status = 'approved' AND r.rating >= 4 ORDER BY RAND() LIMIT 4");
 $testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Get blog posts

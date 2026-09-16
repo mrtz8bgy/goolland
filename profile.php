@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "includes/db.php";';
+require_once 'includes/db.php';
 
 // Redirect to login if not logged in
 if (!isLoggedIn()) {

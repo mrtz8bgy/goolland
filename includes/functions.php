@@ -1640,13 +1640,22 @@ function updateCartItem($cartId, $quantity) {
 /**
  * Delete cart item
  */
-function deleteCartItem($cartId) {
+function deleteCartItem($cartId, $userId = null) {
     global $pdo;
     try {
-        $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ?");
-        return $stmt->execute([$cartId]);
+        if ($userId === null) {
+            $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ?");
+            return $stmt->execute([$cartId]);
+        }
+
+        $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
+        $stmt->execute([$cartId, $userId]);
+        return ['success' => true, 'message' => 'آیتم از سبد خرید حذف شد'];
     } catch (PDOException $e) {
-        return false;
+        if ($userId === null) {
+            return false;
+        }
+        return ['success' => false, 'message' => 'خطا در حذف آیتم: ' . $e->getMessage()];
     }
 }
 
@@ -3621,7 +3630,7 @@ function forgotPassword($email) {
         $subject = 'بازیابی رمز عبور - گولند';
         $message = "<p>سلام {$user['name']}</p>";
         $message .= "<p>برای بازیابی رمز عبور خود روی لینک زیر کلیک کنید:</p>";
-        $message .= "<p><a href="$resetLink">بازیابی رمز عبور</a></p>";
+        $message .= "<p><a href=\"$resetLink\">بازیابی رمز عبور</a></p>";
         $message .= "<p>اگر شما این درخواست را نداده‌اید، لطفا آن را نادیده بگیرید.</p>";
         
         if (sendEmail($user['email'], $subject, $message)) {
@@ -3710,20 +3719,6 @@ function updateCartItemQuantity($cartId, $quantity, $userId) {
         
     } catch (PDOException $e) {
         return ['success' => false, 'message' => 'خطا در به‌روزرسانی سبد خرید: ' . $e->getMessage()];
-    }
-}
-
-/**
- * Delete cart item
- */
-function deleteCartItem($cartId, $userId) {
-    global $pdo;
-    try {
-        $stmt = $pdo->prepare("DELETE FROM cart WHERE id = ? AND user_id = ?");
-        $stmt->execute([$cartId, $userId]);
-        return ['success' => true, 'message' => 'آیتم از سبد خرید حذف شد'];
-    } catch (PDOException $e) {
-        return ['success' => false, 'message' => 'خطا در حذف آیتم: ' . $e->getMessage()];
     }
 }
 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once "includes/db.php";';
+require_once 'includes/db.php';
 
 // Get post slug
 $slug = isset($_GET['slug']) ? sanitizeInput($_GET['slug']) : '';
@@ -260,7 +260,10 @@ require_once 'includes/header.php';
                         <a href="blog.php?query=<?php echo urlencode($tag); ?>">
                             <?php echo htmlspecialchars($tag); ?>
                         </a>
-                    <?php endforeach; ?>
+                    <?php
+                        endif;
+                    endforeach;
+                    ?>
                 </div>
             <?php endif; ?>
             

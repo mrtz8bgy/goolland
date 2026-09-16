@@ -17,8 +17,9 @@ $currentUrl = $_SERVER['REQUEST_URI'];
 $isAdminPanel = strpos($currentUrl, '/admin/') !== false;
 
 // Close main content wrapper
-if (!$isAdminPanel):
+if (!$isAdminPanel) {
     echo '</div> <!-- .main-content-wrapper -->';
+}
 ?>
 
 <?php if (!$isAdminPanel): ?>

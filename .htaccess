@@ -11,6 +11,7 @@
     # Redirect to HTTPS if available
     RewriteCond %{HTTPS} off
     RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteCond %{HTTP_HOST} !^localhost(:[0-9]+)?$ [NC]
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     # Front Controller for SEO-friendly URLs
@@ -178,20 +179,6 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Allow access to specific files in includes
-<DirectoryMatch "^/includes">
-    Order Deny,Allow
-    Deny from all
-</DirectoryMatch>
-
-# Block access to PHP files in uploads
-<DirectoryMatch "^/assets/images/uploads">
-    <FilesMatch "\.php">
-        Order Allow,Deny
-        Deny from all
-    </FilesMatch>
-</DirectoryMatch>
-
 # Custom error pages
 ErrorDocument 400 /400.php
 ErrorDocument 401 /401.php
@@ -231,11 +218,6 @@ ServerSignature Off
 
 FileETag None
 
-# Custom log format
-<IfModule mod_log_config.c>
-    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
-</IfModule>
-
 # Gzip compression for text files
 <IfModule mod_mime.c>
     AddEncoding gzip .gz
@@ -253,27 +235,6 @@ FileETag None
     Header set Pragma "no-cache"
     Header set Expires 0
 </FilesMatch>
-
-# Security: Disable PHP execution in uploads
-<Directory "/assets/images/uploads">
-    <FilesMatch "\.php">
-        Deny from all
-    </FilesMatch>
-</Directory>
-
-# Security: Disable PHP execution in assets
-<Directory "/assets">
-    <FilesMatch "\.php">
-        Deny from all
-    </FilesMatch>
-</Directory>
-
-# Security: Disable PHP execution in cache
-<Directory "/cache">
-    <FilesMatch "\.php">
-        Deny from all
-    </FilesMatch>
-</Directory>
 
 # Allow access to robots.txt and sitemap.xml
 <FilesMatch "^(robots\.txt|sitemap\.xml)$">

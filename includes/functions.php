@@ -100,6 +100,11 @@ function redirect($url) {
  */
 function getSetting($key, $default = '') {
     global $pdo;
+
+    if (!isset($pdo) || !$pdo instanceof PDO) {
+        return $default;
+    }
+
     try {
         $stmt = $pdo->prepare("SELECT setting_value FROM settings WHERE setting_key = ?");
         $stmt->execute([$key]);

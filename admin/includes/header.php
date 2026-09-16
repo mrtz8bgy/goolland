@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Get admin info
 $admin_info = [];
 if (isset($_SESSION['admin_id'])) {
@@ -28,30 +28,30 @@ if ($result) {
 <header class="admin-header">
     <div class="admin-header-inner">
         <div class="admin-logo">
-            <span>🌿 Goolland</span>
+            <span>ðŸŒ¿ Goolland</span>
         </div>
         
         <nav class="admin-nav">
             <a href="dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active' : ''; ?>">
-                داشبورد
+                Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯
             </a>
-            <a href="orders.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : ''; ?>">
-                سفارش‌ها
+            <a href="manage_orders.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'order') !== false ? 'active' : ''; ?>">
+                Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§
                 <?php if ($pending_orders > 0): ?>
                     <sup style="color: var(--admin-danger); font-size: 10px;"><?php echo $pending_orders; ?></sup>
                 <?php endif; ?>
             </a>
-            <a href="products.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : ''; ?>">
-                محصولات
+            <a href="manage_products.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'product') !== false ? 'active' : ''; ?>">
+                Ù…Ø­ØµÙˆÙ„Ø§Øª
             </a>
-            <a href="categories.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'category') !== false ? 'active' : ''; ?>">
-                دسته‌بندی‌ها
+            <a href="manage_categories.php" class="<?php echo strpos($_SERVER['PHP_SELF'], 'category') !== false ? 'active' : ''; ?>">
+                Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒâ€ŒÙ‡Ø§
             </a>
         </nav>
         
         <div class="admin-header-actions">
             <div class="admin-search">
-                <input type="text" placeholder="جستجو...">
+                <input type="text" placeholder="Ø¬Ø³ØªØ¬Ùˆ...">
                 <button type="submit"><i class="fas fa-search"></i></button>
             </div>
             
@@ -67,15 +67,16 @@ if ($result) {
                     <?php echo mb_substr($_SESSION['admin_username'] ?? 'A', 0, 1); ?>
                 </div>
                 <div class="admin-user-info">
-                    <span class="admin-user-name"><?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'مدیر'); ?></span>
+                    <span class="admin-user-name"><?php echo htmlspecialchars($_SESSION['admin_username'] ?? 'Ù…Ø¯ÛŒØ±'); ?></span>
                     <span class="admin-user-role"><?php echo htmlspecialchars($admin_info['role'] ?? 'admin'); ?></span>
                 </div>
             </div>
             
             <a href="logout.php" class="admin-btn admin-btn-secondary admin-btn-sm">
                 <i class="fas fa-sign-out-alt"></i>
-                خروج
+                Ø®Ø±ÙˆØ¬
             </a>
         </div>
     </div>
 </header>
+

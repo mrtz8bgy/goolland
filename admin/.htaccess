@@ -2,32 +2,21 @@
 # Prevent directory listing
 Options -Indexes
 
-# Protect admin directory
-AuthType Basic
-AuthName "Restricted Area"
-AuthUserFile /dev/null
-Require valid-user
-
-# Allow access from PHP scripts
+# Allow PHP files to run normally; auth is handled in PHP code
 <FilesMatch "\.php$">
     Require all granted
 </FilesMatch>
 
-# Block direct access to sensitive files
-<FilesMatch "\.(inc|php|html|htm|txt|log|ini|cfg|conf)$">
-    Order Deny,Allow
-    Deny from all
-    Allow from env=REDIRECT_STATUS
+# Block direct access to sensitive non-PHP files
+<FilesMatch "\.(inc|html|htm|txt|log|ini|cfg|conf)$">
+    Require all denied
 </FilesMatch>
 
-# Rewrite rules
+# Rewrite rules for admin routing
 RewriteEngine On
-
-# Redirect to login if not logged in (handled by PHP)
-# Prevent access to files without authentication
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [QSA,L]
+RewriteRule ^ index.php [L]
 
 # Cache control
 <IfModule mod_expires.c>

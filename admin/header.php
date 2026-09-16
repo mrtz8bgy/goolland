@@ -69,15 +69,13 @@
                 </li>
                 
                 <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_products.php', 'manage_categories.php', 'manage_brands.php', 'manage_reviews.php']) ? 'active' : ''; ?>">
+                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_products.php', 'manage_categories.php']) ? 'active' : ''; ?>">
                         <i class="fas fa-box-open"></i>
                         <span>محصولات</span>
                     </a>
                     <ul class="nav-submenu">
                         <li><a href="manage_products.php">مدیریت محصولات</a></li>
                         <li><a href="manage_categories.php">مدیریت دسته‌بندی‌ها</a></li>
-                        <li><a href="manage_brands.php">مدیریت برندها</a></li>
-                        <li><a href="manage_reviews.php">مدیریت نظرات</a></li>
                     </ul>
                 </li>
                 
@@ -104,14 +102,13 @@
                 </li>
                 
                 <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_blog.php', 'manage_blog_categories.php', 'manage_blog_comments.php']) ? 'active' : ''; ?>">
+                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_posts.php', 'manage_post_categories.php']) ? 'active' : ''; ?>">
                         <i class="fas fa-blog"></i>
                         <span>بلاگ</span>
                     </a>
                     <ul class="nav-submenu">
-                        <li><a href="manage_blog.php">مدیریت مقالات</a></li>
-                        <li><a href="manage_blog_categories.php">مدیریت دسته‌بندی‌ها</a></li>
-                        <li><a href="manage_blog_comments.php">مدیریت نظرات</a></li>
+                        <li><a href="manage_posts.php">مدیریت مقالات</a></li>
+                        <li><a href="manage_post_categories.php">مدیریت دسته‌بندی‌ها</a></li>
                     </ul>
                 </li>
                 
@@ -123,52 +120,28 @@
                 </li>
                 
                 <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_coupons.php', 'manage_shipping.php', 'manage_payment.php']) ? 'active' : ''; ?>">
+                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_coupons.php', 'settings.php']) ? 'active' : ''; ?>">
                         <i class="fas fa-cog"></i>
                         <span>تنظیمات فروشگاه</span>
                     </a>
                     <ul class="nav-submenu">
                         <li><a href="manage_coupons.php">مدیریت کوپن‌ها</a></li>
-                        <li><a href="manage_shipping.php">روش‌های ارسال</a></li>
-                        <li><a href="manage_payment.php">روش‌های پرداخت</a></li>
-                    </ul>
-                </li>
-                
-                <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_contact.php', 'manage_newsletter.php', 'manage_faq.php']) ? 'active' : ''; ?>">
-                        <i class="fas fa-envelope"></i>
-                        <span>ارتباط با مشتریان</span>
-                    </a>
-                    <ul class="nav-submenu">
-                        <li><a href="manage_contact.php">پیام‌های تماس</a></li>
-                        <li><a href="manage_newsletter.php">خبرنامه</a></li>
-                        <li><a href="manage_faq.php">سوالات متداول</a></li>
-                    </ul>
-                </li>
-                
-                <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['manage_banners.php', 'manage_social.php', 'manage_settings.php']) ? 'active' : ''; ?>">
-                        <i class="fas fa-paint-brush"></i>
-                        <span>ظاهری و تنظیمات</span>
-                    </a>
-                    <ul class="nav-submenu">
-                        <li><a href="manage_banners.php">مدیریت بنرها</a></li>
-                        <li><a href="manage_social.php">شبکه‌های اجتماعی</a></li>
                         <li><a href="settings.php">تنظیمات سایت</a></li>
                     </ul>
                 </li>
                 
-                <li class="nav-item has-submenu">
-                    <a href="#" class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['system_info.php', 'database_backup.php', 'cache_management.php']) ? 'active' : ''; ?>">
-                        <i class="fas fa-server"></i>
-                        <span>سیستم</span>
+                <li class="nav-item">
+                    <a href="activities.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'activities.php' ? 'active' : ''; ?>">
+                        <i class="fas fa-history"></i>
+                        <span>تاریخچه فعالیت‌ها</span>
                     </a>
-                    <ul class="nav-submenu">
-                        <li><a href="system_info.php">اطلاعات سیستم</a></li>
-                        <li><a href="database_backup.php">پشتیبان گیری</a></li>
-                        <li><a href="cache_management.php">مدیریت کش</a></li>
-                        <li><a href="logs.php">لاگ‌ها</a></li>
-                    </ul>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="backup.php" class="<?php echo basename($_SERVER['PHP_SELF']) === 'backup.php' ? 'active' : ''; ?>">
+                        <i class="fas fa-database"></i>
+                        <span>پشتیبان‌گیری</span>
+                    </a>
                 </li>
                 
                 <li class="nav-item">

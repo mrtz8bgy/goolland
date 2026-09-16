@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Get current page
 $current_page = basename($_SERVER['PHP_SELF']);
 
@@ -28,7 +28,7 @@ if ($result) {
 <aside class="admin-sidebar" id="admin-sidebar">
     <div class="admin-sidebar-header">
         <div class="admin-sidebar-logo">
-            <span>🌿 Goolland</span>
+            <span>ðŸŒ¿ Goolland</span>
         </div>
         <button class="admin-sidebar-close" id="admin-sidebar-close">
             <i class="fas fa-times"></i>
@@ -39,14 +39,14 @@ if ($result) {
         <div class="admin-menu-item <?php echo $current_page === 'dashboard.php' ? 'active' : ''; ?>">
             <a href="dashboard.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-chart-line"></i></span>
-                <span class="label">داشبورد</span>
+                <span class="label">Ø¯Ø§Ø´Ø¨ÙˆØ±Ø¯</span>
             </a>
         </div>
         
         <div class="admin-menu-item <?php echo strpos($current_page, 'order') !== false ? 'active' : ''; ?>">
-            <a href="orders.php" class="admin-menu-link">
+            <a href="manage_orders.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-shopping-bag"></i></span>
-                <span class="label">سفارش‌ها</span>
+                <span class="label">Ø³ÙØ§Ø±Ø´â€ŒÙ‡Ø§</span>
                 <?php if ($pending_orders > 0): ?>
                     <span class="badge"><?php echo $pending_orders; ?></span>
                 <?php endif; ?>
@@ -54,47 +54,47 @@ if ($result) {
         </div>
         
         <div class="admin-menu-item <?php echo strpos($current_page, 'product') !== false ? 'active' : ''; ?>">
-            <a href="products.php" class="admin-menu-link">
+            <a href="manage_products.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-seedling"></i></span>
-                <span class="label">محصولات</span>
+                <span class="label">Ù…Ø­ØµÙˆÙ„Ø§Øª</span>
             </a>
         </div>
         
         <div class="admin-menu-item <?php echo strpos($current_page, 'category') !== false ? 'active' : ''; ?>">
-            <a href="categories.php" class="admin-menu-link">
+            <a href="manage_categories.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-folder"></i></span>
-                <span class="label">دسته‌بندی‌ها</span>
+                <span class="label">Ø¯Ø³ØªÙ‡â€ŒØ¨Ù†Ø¯ÛŒâ€ŒÙ‡Ø§</span>
             </a>
         </div>
         
-        <div class="admin-menu-item <?php echo strpos($current_page, 'article') !== false ? 'active' : ''; ?>">
-            <a href="articles.php" class="admin-menu-link">
+        <div class="admin-menu-item <?php echo strpos($current_page, 'post') !== false ? 'active' : ''; ?>">
+            <a href="manage_posts.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-newspaper"></i></span>
-                <span class="label">مقالات</span>
+                <span class="label">Ù…Ù‚Ø§Ù„Ø§Øª</span>
             </a>
         </div>
         
         <div class="admin-menu-item <?php echo strpos($current_page, 'user') !== false ? 'active' : ''; ?>">
-            <a href="users.php" class="admin-menu-link">
+            <a href="manage_users.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-users"></i></span>
-                <span class="label">کاربران</span>
+                <span class="label">Ú©Ø§Ø±Ø¨Ø±Ø§Ù†</span>
             </a>
         </div>
         
-        <div class="admin-menu-item <?php echo strpos($current_page, 'contact') !== false ? 'active' : ''; ?>">
-            <a href="contacts.php" class="admin-menu-link">
+        <div class="admin-menu-item <?php echo strpos($current_page, 'activities') !== false ? 'active' : ''; ?>">
+            <a href="activities.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-envelope"></i></span>
-                <span class="label">پیام‌ها</span>
+                <span class="label">ÙØ¹Ø§Ù„ÛŒØªâ€ŒÙ‡Ø§</span>
                 <?php if ($unread_contacts > 0): ?>
                     <span class="badge"><?php echo $unread_contacts; ?></span>
                 <?php endif; ?>
             </a>
         </div>
         
-        <div class="admin-menu-item <?php echo strpos($current_page, 'review') !== false ? 'active' : ''; ?>">
-            <a href="reviews.php" class="admin-menu-link">
+        <div class="admin-menu-item <?php echo strpos($current_page, 'report') !== false ? 'active' : ''; ?>">
+            <a href="reports.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-star"></i></span>
-                <span class="label">نقد و بررسی‌ها</span>
+                <span class="label">Ú¯Ø²Ø§Ø±Ø´â€ŒÙ‡Ø§</span>
                 <?php if ($pending_reviews > 0): ?>
                     <span class="badge"><?php echo $pending_reviews; ?></span>
                 <?php endif; ?>
@@ -104,14 +104,14 @@ if ($result) {
         <div class="admin-menu-item <?php echo strpos($current_page, 'setting') !== false ? 'active' : ''; ?>">
             <a href="settings.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-cog"></i></span>
-                <span class="label">تنظیمات سایت</span>
+                <span class="label">ØªÙ†Ø¸ÛŒÙ…Ø§Øª Ø³Ø§ÛŒØª</span>
             </a>
         </div>
         
         <div class="admin-menu-item <?php echo strpos($current_page, 'admin') !== false ? 'active' : ''; ?>">
-            <a href="admins.php" class="admin-menu-link">
+            <a href="manage_admins.php" class="admin-menu-link">
                 <span class="icon"><i class="fas fa-user-shield"></i></span>
-                <span class="label">مدیران سایت</span>
+                <span class="label">Ù…Ø¯ÛŒØ±Ø§Ù† Ø³Ø§ÛŒØª</span>
             </a>
         </div>
     </nav>
@@ -121,3 +121,4 @@ if ($result) {
 <button class="admin-sidebar-toggle" id="admin-sidebar-toggle">
     <i class="fas fa-bars"></i>
 </button>
+

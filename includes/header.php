@@ -62,6 +62,7 @@ $isAdminPanel = strpos($currentUrl, '/admin/') !== false;
     <link rel="stylesheet" href="assets/css/nice-select.css">
     <link rel="stylesheet" href="assets/css/animate.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/additional-styles.css">
     <?php if (file_exists('assets/css/custom.css')): ?>
         <link rel="stylesheet" href="assets/css/custom.css">
     <?php endif; ?>

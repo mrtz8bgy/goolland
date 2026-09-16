@@ -1,258 +1,186 @@
 <?php
-// Get settings for footer
-$settings = [];
-$result = $conn->query("SELECT * FROM settings LIMIT 1");
-if ($result && $result->num_rows > 0) {
-    $settings = $result->fetch_assoc();
-}
+// Get site settings
+$siteName = getSetting('site_name', 'گولند - فروشگاه گل و گیاه');
+$siteDescription = getSetting('site_description', 'فروشگاه آنلاین گل و گیاه با کیفیت بالا');
+$sitePhone = getSetting('site_phone', '021-12345678');
+$siteEmail = getSetting('site_email', 'info@goolland.ir');
+$siteAddress = getSetting('site_address', 'تهران، خیابان ولیعصر، پلاک 123');
 
-// Get categories for footer
-$categories = $conn->query("SELECT * FROM categories WHERE status = 'active' ORDER BY sort_order ASC, name ASC LIMIT 6");
+// Get social media links
+$socialMedia = getSocialMediaLinks();
 
-// Get recent articles for footer
-$articles = $conn->query("SELECT * FROM articles WHERE status = 'publish' ORDER BY published_at DESC LIMIT 3");
+// Get pages for footer
+$pages = getSitePages();
 
-// Site stats
-$products_count = getTableCount('products', "status = 'publish'", $conn);
-$articles_count = getTableCount('articles', "status = 'publish'", $conn);
-$categories_count = getTableCount('categories', "status = 'active'", $conn);
+// Check if we're in admin panel
+$currentUrl = $_SERVER['REQUEST_URI'];
+$isAdminPanel = strpos($currentUrl, '/admin/') !== false;
+
+// Close main content wrapper
+if (!$isAdminPanel):
+    echo '</div> <!-- .main-content-wrapper -->';
 ?>
 
-    </main>
-
+<?php if (!$isAdminPanel): ?>
     <!-- Newsletter Section -->
-    <section class="newsletter-section">
+    <section class="newsletter-section footer-newsletter">
         <div class="container">
             <div class="newsletter-content">
-                <div class="newsletter-text">
-                    <h3>📧 از آخرین خبرها باخبر شوید</h3>
-                    <p>برای دریافت تخفیف‌ها و خبرهای ویژه، ایمیل خود را ثبت کنید</p>
+                <div>
+                    <h3><i class="fas fa-paper-plane"></i> برای دریافت اخبار و تخفیف‌ها عضو شوید</h3>
+                    <p>با عضویت در خبرنامه گولند، از آخرین تخفیف‌ها، محصولات جدید و رویدادهای ویژه مطلع شوید.</p>
                 </div>
-                <form class="newsletter-form" action="/subscribe.php" method="POST">
-                    <input type="email" name="email" placeholder="آدرس ایمیل خود را وارد کنید..." required>
+                <form action="includes/newsletter.php" method="post" class="newsletter-form">
+                    <input type="email" name="email" placeholder="آدرس ایمیل خود را وارد کنید" required>
                     <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i>
                         عضویت
                     </button>
                 </form>
             </div>
         </div>
     </section>
+<?php endif; ?>
 
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container footer-inner">
-            <!-- About Section -->
-            <div class="footer-section footer-about">
-                <h3 class="footer-title">
-                    <?php if (!empty($settings['logo'])): ?>
-                        <img src="/assets/images/<?php echo htmlspecialchars($settings['logo']); ?>" alt="<?php echo htmlspecialchars($settings['site_name'] ?? 'Goolland'); ?>" style="height: 40px; margin-bottom: 10px;">
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="container">
+        <div class="footer-container">
+            <!-- Footer Info -->
+            <div class="footer-info">
+                <div class="footer-logo">
+                    <?php
+                    $siteLogo = getSetting('site_logo', 'assets/images/logo.png');
+                    if (file_exists($siteLogo)):
+                    ?>
+                        <img src="<?php echo $siteLogo; ?>" alt="<?php echo htmlspecialchars($siteName); ?>">
                     <?php else: ?>
-                        🌿
+                        <div class="logo-placeholder">
+                            <i class="fas fa-leaf"></i>
+                            <span><?php echo htmlspecialchars($siteName); ?></span>
+                        </div>
                     <?php endif; ?>
-                    <span><?php echo htmlspecialchars($settings['site_name'] ?? 'Goolland'); ?></span>
-                </h3>
+                </div>
                 <p class="footer-description">
-                    <?php echo htmlspecialchars($settings['about_text'] ?? 'فروشگاه آنلاین گل و گیاه با بهترین کیفیت و قیمت مناسب'); ?>
+                    <?php echo htmlspecialchars($siteDescription); ?>
                 </p>
+                
+                <!-- Social Media -->
                 <div class="footer-social">
-                    <?php if (!empty($settings['instagram'])): ?>
-                        <a href="<?php echo htmlspecialchars($settings['instagram']); ?>" target="_blank" rel="noopener noreferrer" title="اینستاگرام">
-                            <span class="social-icon">📸</span>
+                    <?php foreach ($socialMedia as $social): ?>
+                        <a href="<?php echo htmlspecialchars($social['url']); ?>" 
+                           target="_blank" 
+                           title="<?php echo htmlspecialchars($social['name']); ?>"
+                           class="social-link">
+                            <i class="fab fa-<?php echo htmlspecialchars($social['icon']); ?>"></i>
                         </a>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['telegram'])): ?>
-                        <a href="<?php echo htmlspecialchars($settings['telegram']); ?>" target="_blank" rel="noopener noreferrer" title="تلگرام">
-                            <span class="social-icon">💬</span>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['whatsapp'])): ?>
-                        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $settings['whatsapp']); ?>" target="_blank" rel="noopener noreferrer" title="واتساپ">
-                            <span class="social-icon">🟢</span>
-                        </a>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['facebook'])): ?>
-                        <a href="<?php echo htmlspecialchars($settings['facebook']); ?>" target="_blank" rel="noopener noreferrer" title="فیسبوک">
-                            <span class="social-icon">📘</span>
-                        </a>
-                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </div>
+                
+                <!-- Payment Methods -->
+                <div class="payment-methods">
+                    <h4>روش‌های پرداخت</h4>
+                    <div class="payment-icons">
+                        <img src="assets/images/payment/zarinpal.png" alt="زارین پال">
+                        <img src="assets/images/payment/mellat.png" alt="بانک ملت">
+                        <img src="assets/images/payment/saman.png" alt="بانک سامان">
+                        <img src="assets/images/payment/tejarat.png" alt="بانک تجارت">
+                    </div>
                 </div>
             </div>
-
+            
             <!-- Quick Links -->
-            <div class="footer-section">
-                <h3 class="footer-title">لینک‌های سریع</h3>
-                <ul class="footer-links">
-                    <li><a href="/">خانه</a></li>
-                    <li><a href="/about.php">درباره ما</a></li>
-                    <li><a href="/products.php">محصولات</a></li>
-                    <li><a href="/articles.php">مقالات</a></li>
-                    <li><a href="/contact.php">تماس با ما</a></li>
-                    <li><a href="/cart.php">سبد خرید</a></li>
+            <div class="footer-links">
+                <h4><i class="fas fa-link"></i> لینک‌های سریع</h4>
+                <ul>
+                    <li><a href="index.php">خانه</a></li>
+                    <li><a href="products.php">محصولات</a></li>
+                    <li><a href="products.php?featured=1">محصولات ویژه</a></li>
+                    <li><a href="products.php?sort=new">محصولات جدید</a></li>
+                    <li><a href="products.php?sort=bestselling">پرفروش‌ترین‌ها</a></li>
                 </ul>
             </div>
-
-            <!-- Categories -->
-            <div class="footer-section">
-                <h3 class="footer-title">دسته‌بندی‌ها</h3>
-                <ul class="footer-links">
-                    <?php if ($categories && $categories->num_rows > 0): ?>
-                        <?php while ($category = $categories->fetch_assoc()): ?>
-                            <li>
-                                <a href="/products.php?category=<?php echo htmlspecialchars($category['slug']); ?>">
-                                    <?php echo htmlspecialchars($category['name']); ?>
-                                </a>
-                            </li>
-                        <?php endwhile; ?>
+            
+            <!-- Customer Service -->
+            <div class="footer-links">
+                <h4><i class="fas fa-headset"></i> خدمات مشتریان</h4>
+                <ul>
+                    <li><a href="contact.php">تماس با ما</a></li>
+                    <li><a href="about.php">درباره ما</a></li>
+                    <li><a href="page.php?slug=terms">قوانین و مقررات</a></li>
+                    <li><a href="page.php?slug=privacy">حریم خصوصی</a></li>
+                    <li><a href="page.php?slug=return">سیاست بازگرداندن</a></li>
+                </ul>
+            </div>
+            
+            <!-- Account -->
+            <div class="footer-links">
+                <h4><i class="fas fa-user"></i> حساب کاربری</h4>
+                <ul>
+                    <?php if (!isLoggedIn()): ?>
+                        <li><a href="login.php">ورود</a></li>
+                        <li><a href="register.php">ثبت‌نام</a></li>
                     <?php else: ?>
-                        <li><a href="/products.php">همه محصولات</a></li>
+                        <li><a href="profile.php">حساب کاربری</a></li>
+                        <li><a href="orders.php">سفارشات من</a></li>
+                        <li><a href="wishlist.php">علاقه‌مندی‌ها</a></li>
+                        <li><a href="logout.php">خروج</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
-
-            <!-- Latest Articles -->
-            <div class="footer-section">
-                <h3 class="footer-title">آخرین مقالات</h3>
-                <ul class="footer-articles">
-                    <?php if ($articles && $articles->num_rows > 0): ?>
-                        <?php while ($article = $articles->fetch_assoc()): ?>
-                            <li>
-                                <a href="/article.php?id=<?php echo $article['id']; ?>">
-                                    <?php echo htmlspecialchars(mb_substr($article['title'], 0, 50)); ?>
-                                </a>
-                                <span class="article-date">
-                                    <?php echo date('Y/m/d', strtotime($article['published_at'] ?? $article['created_at'])); ?>
-                                </span>
-                            </li>
-                        <?php endwhile; ?>
-                    <?php else: ?>
-                        <li><a href="/articles.php">مشاهده همه مقالات</a></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-
+            
             <!-- Contact Info -->
-            <div class="footer-section">
-                <h3 class="footer-title">اطلاعات تماس</h3>
-                <ul class="footer-contact">
-                    <?php if (!empty($settings['address'])): ?>
-                        <li>
-                            <span class="contact-icon">📍</span>
-                            <span><?php echo htmlspecialchars($settings['address']); ?></span>
-                        </li>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['phone'])): ?>
-                        <li>
-                            <span class="contact-icon">📞</span>
-                            <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $settings['phone']); ?>">
-                                <?php echo htmlspecialchars($settings['phone']); ?>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['email'])): ?>
-                        <li>
-                            <span class="contact-icon">✉️</span>
-                            <a href="mailto:<?php echo htmlspecialchars($settings['email']); ?>">
-                                <?php echo htmlspecialchars($settings['email']); ?>
-                            </a>
-                        </li>
-                    <?php endif; ?>
-                    <?php if (!empty($settings['working_hours'])): ?>
-                        <li>
-                            <span class="contact-icon">⏰</span>
-                            <span><?php echo htmlspecialchars($settings['working_hours']); ?></span>
-                        </li>
-                    <?php endif; ?>
+            <div class="footer-contact">
+                <h4><i class="fas fa-map-marker-alt"></i> اطلاعات تماس</h4>
+                <ul>
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span><?php echo htmlspecialchars($siteAddress); ?></span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone"></i>
+                        <a href="tel:<?php echo htmlspecialchars($sitePhone); ?>">
+                            <?php echo htmlspecialchars($sitePhone); ?>
+                        </a>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:<?php echo htmlspecialchars($siteEmail); ?>">
+                            <?php echo htmlspecialchars($siteEmail); ?>
+                        </a>
+                    </li>
+                    <li>
+                        <i class="fas fa-clock"></i>
+                        <span>شنبه تا چهارشنبه: 9:00 - 18:00</span>
+                    </li>
                 </ul>
             </div>
         </div>
+    </div>
+</footer>
 
-        <!-- Footer Bottom -->
-        <div class="footer-bottom">
-            <div class="container">
-                <div class="footer-stats">
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo number_format($products_count); ?></span>
-                        <span class="stat-label">محصول</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo number_format($articles_count); ?></span>
-                        <span class="stat-label">مقاله</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number"><?php echo number_format($categories_count); ?></span>
-                        <span class="stat-label">دسته‌بندی</span>
-                    </div>
-                </div>
-                <div class="footer-copyright">
-                    <p>
-                        © <?php echo date('Y'); ?> 
-                        <strong><?php echo htmlspecialchars($settings['site_name'] ?? 'Goolland'); ?></strong>
-                        . تمامی حقوق محفوظ است.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
+<!-- Back to Top Button -->
+<button class="back-to-top" onclick="scrollToTop()" title="بازگشت به بالا">
+    <i class="fas fa-chevron-up"></i>
+</button>
 
-    <!-- Back to Top Button -->
-    <button id="back-to-top" class="back-to-top" title="بازگشت به بالا">
-        ↑
-    </button>
+<!-- WhatsApp Button -->
+<a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $sitePhone); ?>" 
+   class="whatsapp-button" 
+   target="_blank" 
+   title="ارتباط از طریق واتس‌اپ">
+    <i class="fab fa-whatsapp"></i>
+</a>
 
-    <!-- WhatsApp Float Button -->
-    <?php if (!empty($settings['whatsapp'])): ?>
-        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $settings['whatsapp']); ?>" 
-           class="whatsapp-float" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           title="واتساپ">
-            🟢
-        </a>
-    <?php endif; ?>
+<!-- JS Files -->
+<script src="assets/js/main.js"></script>
+<script src="assets/js/custom.js"></script>
 
-    <!-- JavaScript -->
-    <script src="/assets/js/script.js"></script>
-    
-    <!-- Google Analytics (if configured) -->
-    <?php if (!empty($settings['google_analytics'])): ?>
-        <script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo htmlspecialchars($settings['google_analytics']); ?>"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '<?php echo htmlspecialchars($settings["google_analytics"]); ?>');
-        </script>
-    <?php endif; ?>
+<!-- Custom JS for the page -->
+<?php if (isset($pageScripts)): ?>
+    <?php echo $pageScripts; ?>
+<?php endif; ?>
 
-    <!-- Schema.org Markup -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "<?php echo addslashes($settings['site_name'] ?? 'Goolland'); ?>",
-        "url": "<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST']; ?>",
-        "description": "<?php echo addslashes($settings['description'] ?? 'فروشگاه آنلاین گل و گیاه'); ?>",
-        "logo": "<?php echo (isset($_SERVER['HTTPS']) ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'] . ($settings['logo'] ? '/assets/images/' . $settings['logo'] : '/assets/images/logo.png'); ?>",
-        "contactPoint": [
-            {
-                "@type": "ContactPoint",
-                "telephone": "<?php echo preg_replace('/[^0-9+]/', '', $settings['phone'] ?? ''); ?>",
-                "contactType": "customer service"
-            }
-        ],
-        "address": {
-            "@type": "PostalAddress",
-            "addressLocality": "تهران",
-            "addressCountry": "IR",
-            "streetAddress": "<?php echo addslashes($settings['address'] ?? ''); ?>"
-        },
-        "sameAs": [
-            <?php if (!empty($settings['instagram'])): ?>"<?php echo addslashes($settings['instagram']); ?>",<?php endif; ?>
-            <?php if (!empty($settings['telegram'])): ?>"<?php echo addslashes($settings['telegram']); ?>",<?php endif; ?>
-            <?php if (!empty($settings['whatsapp'])): ?>"https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $settings['whatsapp']); ?>"<?php endif; ?>
-        ]
-    }
-    </script>
-
+<!-- Close HTML -->
 </body>
 </html>

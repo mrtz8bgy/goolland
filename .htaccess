@@ -1,0 +1,282 @@
+# Goolland - Flower & Plant Shop
+# .htaccess Configuration
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Remove trailing slashes
+    RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+    # Redirect to HTTPS if available
+    RewriteCond %{HTTPS} off
+    RewriteCond %{HTTP:X-Forwarded-Proto} !https
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Front Controller for SEO-friendly URLs
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([^.]+)$ index.php?page=$1 [QSA,L]
+
+    # Product URLs
+    RewriteRule ^product/([^/]+)/?$ product.php?slug=$1 [QSA,L]
+    RewriteRule ^product/([^/]+)/([^/]+)/?$ product.php?category=$1&slug=$2 [QSA,L]
+
+    # Category URLs
+    RewriteRule ^category/([^/]+)/?$ products.php?category=$1 [QSA,L]
+    RewriteRule ^category/([^/]+)/page/([0-9]+)/?$ products.php?category=$1&page=$2 [QSA,L]
+
+    # Blog URLs
+    RewriteRule ^blog/([^/]+)/?$ blog-post.php?slug=$1 [QSA,L]
+    RewriteRule ^blog/category/([^/]+)/?$ blog.php?category=$1 [QSA,L]
+    RewriteRule ^blog/page/([0-9]+)/?$ blog.php?page=$1 [QSA,L]
+
+    # Search URL
+    RewriteRule ^search/?$ search.php [QSA,L]
+    RewriteRule ^search/([^/]+)/?$ search.php?query=$1 [QSA,L]
+    RewriteRule ^search/([^/]+)/page/([0-9]+)/?$ search.php?query=$1&page=$2 [QSA,L]
+
+    # User URLs
+    RewriteRule ^profile/?$ profile.php [L]
+    RewriteRule ^wishlist/?$ wishlist.php [L]
+    RewriteRule ^orders/?$ orders.php [L]
+    RewriteRule ^order/([0-9]+)/?$ order-details.php?id=$1 [L]
+    RewriteRule ^track-order/?$ order-tracking.php [L]
+
+    # Static Pages
+    RewriteRule ^page/([^/]+)/?$ page.php?slug=$1 [QSA,L]
+
+    # Admin URLs
+    RewriteRule ^admin/?$ admin/dashboard.php [L]
+    RewriteRule ^admin/login/?$ admin/login.php [L]
+    RewriteRule ^admin/logout/?$ admin/logout.php [L]
+
+    # Contact URL
+    RewriteRule ^contact/?$ contact.php [L]
+
+    # Cart & Checkout
+    RewriteRule ^cart/?$ cart.php [L]
+    RewriteRule ^checkout/?$ checkout.php [L]
+    RewriteRule ^confirmation/?$ order-confirmation.php [L]
+
+    # Pagination
+    RewriteRule ^page/([0-9]+)/?$ index.php?page=$1 [QSA,L]
+</IfModule>
+
+# Compress HTML, CSS, JavaScript, Text, XML and fonts
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript
+</IfModule>
+
+# Enable Gzip compression
+<IfModule mod_gzip.c>
+    mod_gzip_on Yes
+    mod_gzip_dechunk Yes
+    mod_gzip_item_include file .(html?|txt|css|js|php|pl)$
+    mod_gzip_item_include handler ^cgi-script$
+    mod_gzip_item_include mime ^text/.*
+    mod_gzip_item_include mime ^application/x-javascript.*
+    mod_gzip_item_exclude mime ^image/.*
+    mod_gzip_item_exclude rspheader ^Content-Encoding:.*gzip.*
+</IfModule>
+
+# Cache Control
+<IfModule mod_expires.c>
+    # Enable expirations
+    ExpiresActive On
+    ExpiresDefault "access plus 1 month"
+
+    # Images
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
+
+    # CSS
+    ExpiresByType text/css "access plus 1 month"
+
+    # JavaScript
+    ExpiresByType application/javascript "access plus 1 month"
+    ExpiresByType application/x-javascript "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+
+    # Fonts
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
+    ExpiresByType application/x-font-ttf "access plus 1 year"
+    ExpiresByType application/x-font-otf "access plus 1 year"
+    ExpiresByType application/x-font-woff "access plus 1 year"
+    ExpiresByType application/x-font-woff2 "access plus 1 year"
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
+</IfModule>
+
+# Headers
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Enable XSS protection
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Prevent clickjacking
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Force HTTPS in headers
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+    
+    # Referrer Policy
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Content Security Policy
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src 'self'"
+    
+    # Feature Policy
+    Header always set Feature-Policy "geolocation 'none'; microphone 'none'; camera 'none'; payment 'none'; usb 'none'"
+</IfModule>
+
+# File caching
+<IfModule mod_file_cache.c>
+    CacheDefaultExpire 2592000
+    CacheLastModifiedFactor 0.1
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+    php_value max_input_vars 5000
+    php_value max_input_time 300
+    php_flag display_errors Off
+    php_flag log_errors On
+</IfModule>
+
+# Directory listing
+Options -Indexes
+
+# Protect sensitive files
+<FilesMatch "\.(htaccess|ini|log|sh|inc|bak|sql|old)">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Deny access to dotfiles
+<FilesMatch "^\.">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Protect config files
+<FilesMatch "config\.php">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Allow access to specific files in includes
+<DirectoryMatch "^/includes">
+    Order Deny,Allow
+    Deny from all
+</DirectoryMatch>
+
+# Block access to PHP files in uploads
+<DirectoryMatch "^/assets/images/uploads">
+    <FilesMatch "\.php">
+        Order Allow,Deny
+        Deny from all
+    </FilesMatch>
+</DirectoryMatch>
+
+# Custom error pages
+ErrorDocument 400 /400.php
+ErrorDocument 401 /401.php
+ErrorDocument 403 /403.php
+ErrorDocument 404 /404.php
+ErrorDocument 500 /500.php
+
+# Remove PHP version from headers
+<IfModule mod_headers.c>
+    Header unset X-Powered-By
+</IfModule>
+
+# Prevent directory listing
+Options -Indexes
+
+# Set default charset
+AddDefaultCharset UTF-8
+
+# MIME types
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType font/woff .woff
+    AddType font/woff2 .woff2
+    AddType application/json .json
+    AddType application/javascript .js
+    AddType text/css .css
+    AddType text/html .html .htm
+</IfModule>
+
+# Disable server signature
+ServerSignature Off
+
+# Disable ETags
+<IfModule mod_headers.c>
+    Header unset ETag
+</IfModule>
+
+FileETag None
+
+# Custom log format
+<IfModule mod_log_config.c>
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+</IfModule>
+
+# Gzip compression for text files
+<IfModule mod_mime.c>
+    AddEncoding gzip .gz
+    AddEncoding compress .Z
+</IfModule>
+
+# Browser caching
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+    Header set Cache-Control "max-age=31536000, public"
+</FilesMatch>
+
+# Disable caching for dynamic content
+<FilesMatch "\.(php|html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+</FilesMatch>
+
+# Security: Disable PHP execution in uploads
+<Directory "/assets/images/uploads">
+    <FilesMatch "\.php">
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Security: Disable PHP execution in assets
+<Directory "/assets">
+    <FilesMatch "\.php">
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Security: Disable PHP execution in cache
+<Directory "/cache">
+    <FilesMatch "\.php">
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Allow access to robots.txt and sitemap.xml
+<FilesMatch "^(robots\.txt|sitemap\.xml)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>

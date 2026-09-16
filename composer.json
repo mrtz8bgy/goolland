@@ -1,0 +1,63 @@
+{
+    "name": "mrtz8bgy/goolland",
+    "description": "Goolland - Luxury Flower & Plant Online Shop",
+    "type": "project",
+    "license": "MIT",
+    "keywords": [
+        "ecommerce",
+        "flower",
+        "plant",
+        "shop",
+        "php",
+        "mysql"
+    ],
+    "authors": [
+        {
+            "name": "mrtz8bgy",
+            "email": "info@goolland.ir"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*",
+        "ext-gd": "*",
+        "ext-fileinfo": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "squizlabs/php_codesniffer": "^3.6",
+        "phpstan/phpstan": "^1.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Goolland\\": "src/"
+        },
+        "files": [
+            "includes/functions.php",
+            "includes/config.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Goolland\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "cs": "phpcs",
+        "analyse": "phpstan analyse src --level=5",
+        "post-update-cmd": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

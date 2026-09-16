@@ -1,334 +1,317 @@
 <?php
-require_once "includes/header.php";
+session_start();
+require_once 'includes/config.php';
 
-// Get settings
-$settings = [];
-$result = $conn->query("SELECT * FROM settings LIMIT 1");
-if ($result && $result->num_rows > 0) {
-    $settings = $result->fetch_assoc();
-}
+$error = '';
+$success = '';
 
-// Form submission
-$message_sent = false;
-$error_message = '';
+// Get site info
+$siteEmail = getSetting('site_email', 'info@goolland.ir');
+$sitePhone = getSetting('site_phone', '021-12345678');
+$siteAddress = getSetting('site_address', 'تهران، خیابان ولیعصر، پلاک 123');
 
+// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_message'])) {
-    // Validate CSRF token
-    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
-        $error_message = 'خطا در اعتبارسنجی فرم. لطفاً دوباره امتحان کنید.';
+    $name = trim($_POST['name'] ?? '');
+    $email = trim($_POST['email'] ?? '');
+    $phone = trim($_POST['phone'] ?? '');
+    $subject = trim($_POST['subject'] ?? '');
+    $message = trim($_POST['message'] ?? '');
+    
+    // Validate inputs
+    if (empty($name)) {
+        $error = 'لطفا نام و نام خانوادگی را وارد کنید.';
+    } elseif (empty($email)) {
+        $error = 'لطفا آدرس ایمیل را وارد کنید.';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'لطفا آدرس ایمیل معتبر وارد کنید.';
+    } elseif (empty($subject)) {
+        $error = 'لطفا موضوع را وارد کنید.';
+    } elseif (empty($message)) {
+        $error = 'لطفا پیام را وارد کنید.';
     } else {
-        $name = isset($_POST['name']) ? trim($_POST['name']) : '';
-        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-        $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
-        $subject = isset($_POST['subject']) ? trim($_POST['subject']) : '';
-        $message = isset($_POST['message']) ? trim($_POST['message']) : '';
+        // Send message
+        $result = contactUs([
+            'name' => $name,
+            'email' => $email,
+            'phone' => $phone,
+            'subject' => $subject,
+            'message' => $message
+        ]);
         
-        // Validate inputs
-        if (empty($name) || empty($email) || empty($subject) || empty($message)) {
-            $error_message = 'لطفاً تمام فیلدهای مورد نیاز را پر کنید.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error_message = 'لطفاً یک آدرس ایمیل معتبر وارد کنید.';
-        } else {
-            // Sanitize inputs
-            $name = sanitize($name, $conn);
-            $email = sanitize($email, $conn);
-            $phone = sanitize($phone, $conn);
-            $subject = sanitize($subject, $conn);
-            $message = sanitize($message, $conn);
+        if ($result['success']) {
+            $success = $result['message'];
             
-            // Insert into database
-            $stmt = $conn->prepare(
-                "INSERT INTO contacts (name, email, phone, subject, message, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?)"
-            );
+            // Clear form
+            $_POST = [];
             
-            $ip_address = $_SERVER['REMOTE_ADDR'] ?? '';
-            $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? '';
-            
-            $stmt->bind_param("sssssss", $name, $email, $phone, $subject, $message, $ip_address, $user_agent);
-            
-            if ($stmt->execute()) {
-                $message_sent = true;
-                
-                // Clear form
-                $_POST = [];
-            } else {
-                $error_message = 'خطا در ارسال پیام. لطفاً دوباره امتحان کنید.';
+            // Log activity if user is logged in
+            if (isLoggedIn()) {
+                logActivity(getCurrentUserId(), 'contact_us', 'User sent contact message');
             }
+        } else {
+            $error = $result['message'];
         }
     }
 }
 
-// Get CSRF token
-generateCSRFToken();
-$csrf_token = $_SESSION['csrf_token'] ?? '';
+// Get FAQs
+$faqs = getFAQsByCategory();
 
+$pageTitle = 'تماس با ما';
+$pageDescription = 'تماس با فروشگاه آنلاین گل و گیاه گولند';
+require_once 'includes/header.php';
 ?>
 
-<!-- Hero Section -->
-<section class="page-hero">
+<!-- Page Header -->
+<div class="page-header">
     <div class="container">
-        <div class="page-hero-content">
-            <h1>تماس با ما</h1>
-            <p>ما همیشه آماده پاسخگویی به سوال‌های شما هستیم</p>
-        </div>
+        <h1>تماس با ما</h1>
+        <nav class="breadcrumb">
+            <a href="index.php">خانه</a>
+            <i class="fas fa-chevron-left"></i>
+            <span>تماس با ما</span>
+        </nav>
     </div>
-</section>
+</div>
 
-<!-- Contact Info Section -->
-<section class="section">
+<!-- Main Content -->
+<div class="contact-page">
     <div class="container">
-        <div class="section-title">
-            <h2>اطلاعات تماس</h2>
-            <p>راه‌های ارتباط با ما</p>
-        </div>
+        <!-- Success/Error Messages -->
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <?php echo $success; ?>
+            </div>
+        <?php endif; ?>
         
-        <div class="contact-info-grid">
-            <!-- Phone -->
-            <?php if (!empty($settings['phone'])): ?>
-                <div class="contact-card">
-                    <div class="contact-icon">📞</div>
-                    <div class="contact-content">
-                        <h3>تلفن</h3>
-                        <a href="tel:<?php echo preg_replace('/[^0-9+]/', '', $settings['phone']); ?>">
-                            <?php echo htmlspecialchars($settings['phone']); ?>
-                        </a>
-                    </div>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Email -->
-            <?php if (!empty($settings['email'])): ?>
-                <div class="contact-card">
-                    <div class="contact-icon">✉️</div>
-                    <div class="contact-content">
-                        <h3>ایمیل</h3>
-                        <a href="mailto:<?php echo htmlspecialchars($settings['email']); ?>">
-                            <?php echo htmlspecialchars($settings['email']); ?>
-                        </a>
-                    </div>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Address -->
-            <?php if (!empty($settings['address'])): ?>
-                <div class="contact-card">
-                    <div class="contact-icon">📍</div>
-                    <div class="contact-content">
-                        <h3>آدرس</h3>
-                        <p><?php echo nl2br(htmlspecialchars($settings['address'])); ?></p>
-                    </div>
-                </div>
-            <?php endif; ?>
-            
-            <!-- Working Hours -->
-            <?php if (!empty($settings['working_hours'])): ?>
-                <div class="contact-card">
-                    <div class="contact-icon">⏰</div>
-                    <div class="contact-content">
-                        <h3>ساعات کاری</h3>
-                        <p><?php echo htmlspecialchars($settings['working_hours']); ?></p>
-                    </div>
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-</section>
-
-<!-- Map Section -->
-<?php if (!empty($settings['google_map'])): ?>
-    <section class="section map-section">
-        <div class="container">
-            <div class="section-title">
-                <h2>موقعیت ما روی نقشه</h2>
+        <?php if ($error): ?>
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-circle"></i>
+                <?php echo $error; ?>
             </div>
-            <div class="map-container">
-                <?php echo $settings['google_map']; ?>
-            </div>
-        </div>
-    </section>
-<?php endif; ?>
-
-<!-- Contact Form Section -->
-<section class="section contact-form-section">
-    <div class="container">
-        <div class="contact-form-grid">
-            <div class="contact-form-image">
-                <div class="image-placeholder">
-                    <div class="placeholder-icon">💬</div>
-                    <span>فرم تماس</span>
-                </div>
-            </div>
-            
-            <div class="contact-form-wrapper">
-                <div class="section-title">
-                    <h2>فرم تماس</h2>
-                    <p>پیام خود را برای ما ارسال کنید</p>
+        <?php endif; ?>
+        
+        <div class="contact-container">
+            <!-- Contact Info -->
+            <div class="contact-info">
+                <div class="contact-info-header">
+                    <h2><i class="fas fa-info-circle"></i> اطلاعات تماس</h2>
+                    <p>برای ارتباط با ما می‌توانید از روش‌های زیر استفاده کنید</p>
                 </div>
                 
-                <?php if ($message_sent): ?>
-                    <div class="alert alert-success">
-                        ✅ پیام شما با موفقیت ارسال شد. به زودی با شما تماس خواهیم گرفت.
-                    </div>
-                <?php endif; ?>
-                
-                <?php if (!empty($error_message)): ?>
-                    <div class="alert alert-error">
-                        ❌ <?php echo htmlspecialchars($error_message); ?>
-                    </div>
-                <?php endif; ?>
-                
-                <form method="POST" class="contact-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo $csrf_token; ?>">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="name">نام و نام خانوادگی *</label>
-                            <input type="text" id="name" name="name" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
+                <div class="contact-details">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="email">آدرس ایمیل *</label>
-                            <input type="email" id="email" name="email" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                        <div class="contact-text">
+                            <h4>آدرس ایمیل</h4>
+                            <a href="mailto:<?php echo htmlspecialchars($siteEmail); ?>">
+                                <?php echo htmlspecialchars($siteEmail); ?>
+                            </a>
                         </div>
                     </div>
                     
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="phone">شماره تلفن</label>
-                            <input type="tel" id="phone" name="phone" value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
                         </div>
-                        <div class="form-group">
-                            <label for="subject">موضوع *</label>
-                            <select id="subject" name="subject" required>
-                                <option value="" disabled selected>موضوع را انتخاب کنید</option>
-                                <option value="سوال درباره محصول" <?php echo (isset($_POST['subject']) && $_POST['subject'] === 'سوال درباره محصول') ? 'selected' : ''; ?>>سوال درباره محصول</option>
-                                <option value="سفارش گروه" <?php echo (isset($_POST['subject']) && $_POST['subject'] === 'سفارش گروه') ? 'selected' : ''; ?>>سفارش گروه</option>
-                                <option value="پشتیبانی" <?php echo (isset($_POST['subject']) && $_POST['subject'] === 'پشتیبانی') ? 'selected' : ''; ?>>پشتیبانی</option>
-                                <option value="همکاری" <?php echo (isset($_POST['subject']) && $_POST['subject'] === 'همکاری') ? 'selected' : ''; ?>>همکاری</option>
-                                <option value="سایر" <?php echo (isset($_POST['subject']) && $_POST['subject'] === 'سایر') ? 'selected' : ''; ?>>سایر</option>
-                            </select>
+                        <div class="contact-text">
+                            <h4>شماره تلفن</h4>
+                            <a href="tel:<?php echo htmlspecialchars($sitePhone); ?>">
+                                <?php echo htmlspecialchars($sitePhone); ?>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>آدرس</h4>
+                            <p><?php echo htmlspecialchars($siteAddress); ?></p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>ساعات کاری</h4>
+                            <p>شنبه تا چهارشنبه: 9:00 تا 18:00</p>
+                            <p>پنجشنبه: 9:00 تا 14:00</p>
+                            <p>جمعه: تعطیل</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media -->
+                <div class="social-media-section">
+                    <h3><i class="fas fa-share-alt"></i> شبکه‌های اجتماعی</h3>
+                    <div class="social-media-links">
+                        <?php
+                        $socialMedia = getSocialMediaLinks();
+                        foreach ($socialMedia as $social):
+                        ?>
+                            <a href="<?php echo htmlspecialchars($social['url']); ?>" 
+                               target="_blank" 
+                               title="<?php echo htmlspecialchars($social['name']); ?>"
+                               class="social-link">
+                                <i class="fab fa-<?php echo htmlspecialchars($social['icon']); ?>"></i>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                
+                <!-- Map -->
+                <div class="map-section">
+                    <h3><i class="fas fa-map"></i> نقشه</h3>
+                    <div class="map-container">
+                        <!-- Google Map Embed -->
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.913822399227!2d51.3889736153167!3d35.7020479800687!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3f8e00442b73116b%3A0x3f8e00442b73116b!2sTehran%2C%20Iran!5e0!3m2!1sen!2sus!4v1634567890123!5m2!1sen!2sus"
+                            width="100%"
+                            height="300"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Form -->
+            <div class="contact-form-section">
+                <div class="contact-form-header">
+                    <h2><i class="fas fa-paper-plane"></i> ارسال پیام</h2>
+                    <p>پیام خود را برای ما ارسال کنید، به زودی پاسخ خواهیم داد</p>
+                </div>
+                
+                <form method="POST" action="contact.php" class="contact-form">
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="name">نام و نام خانوادگی <span style="color: #f44336;">*</span></label>
+                                <input type="text" id="name" name="name" 
+                                       class="form-control" 
+                                       value="<?php echo htmlspecialchars($_POST['name'] ?? (isLoggedIn() ? $_SESSION['name'] : '')); ?>" 
+                                       placeholder="نام و نام خانوادگی خود را وارد کنید" required>
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="email">آدرس ایمیل <span style="color: #f44336;">*</span></label>
+                                <input type="email" id="email" name="email" 
+                                       class="form-control" 
+                                       value="<?php echo htmlspecialchars($_POST['email'] ?? (isLoggedIn() ? $_SESSION['email'] : '')); ?>" 
+                                       placeholder="آدرس ایمیل خود را وارد کنید" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="phone">شماره تلفن</label>
+                                <input type="tel" id="phone" name="phone" 
+                                       class="form-control" 
+                                       value="<?php echo htmlspecialchars($_POST['phone'] ?? (isLoggedIn() ? $_SESSION['phone'] : '')); ?>" 
+                                       placeholder="شماره تلفن خود را وارد کنید">
+                            </div>
+                        </div>
+                        <div class="form-col">
+                            <div class="form-group">
+                                <label for="subject">موضوع <span style="color: #f44336;">*</span></label>
+                                <select id="subject" name="subject" class="form-control select-control" required>
+                                    <option value="" disabled>موضوع را انتخاب کنید</option>
+                                    <option value="سوال درباره محصول" <?php echo ($_POST['subject'] ?? '') === 'سوال درباره محصول' ? 'selected' : ''; ?>>سوال درباره محصول</option>
+                                    <option value="پیگیری سفارش" <?php echo ($_POST['subject'] ?? '') === 'پیگیری سفارش' ? 'selected' : ''; ?>>پیگیری سفارش</option>
+                                    <option value="شکایت" <?php echo ($_POST['subject'] ?? '') === 'شکایت' ? 'selected' : ''; ?>>شکایت</option>
+                                    <option value="پیشنهاد" <?php echo ($_POST['subject'] ?? '') === 'پیشنهاد' ? 'selected' : ''; ?>>پیشنهاد</option>
+                                    <option value="سایر" <?php echo ($_POST['subject'] ?? '') === 'سایر' ? 'selected' : ''; ?>>سایر</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="message">پیام شما *</label>
-                        <textarea id="message" name="message" rows="6" required><?php echo isset($_POST['message']) ? htmlspecialchars($_POST['message']) : ''; ?></textarea>
+                        <label for="message">پیام <span style="color: #f44336;">*</span></label>
+                        <textarea id="message" name="message" 
+                                  class="form-control" 
+                                  rows="6" 
+                                  placeholder="پیام خود را وارد کنید" required><?php echo htmlspecialchars($_POST['message'] ?? ''); ?></textarea>
                     </div>
                     
-                    <button type="submit" name="send_message" class="btn btn-primary">
-                        ارسال پیام
-                    </button>
+                    <div class="form-actions">
+                        <button type="submit" name="send_message" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                            ارسال پیام
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>
-    </div>
-</section>
-
-<!-- FAQ Section -->
-<section class="section faq-section">
-    <div class="container">
-        <div class="section-title">
-            <h2>سوال‌های متداول</h2>
-            <p>پاسخ به سوال‌های رایج</p>
-        </div>
         
-        <div class="faq-grid">
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>چگونه می‌توانم سفارش دهم؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>شما می‌توانید از طریق سایت ما سفارش دهید. کافی است محصول مورد نظر خود را انتخاب کنید و به سبد خرید اضافه نمایید. سپس مراحل پرداخت را تکمیل کنید.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>آیا تحویل در محل امکان دارد؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>بله، ما در اکثر مناطق تهران و شهرهای بزرگ تحویل در محل را ارائه می‌دهیم. هزینه تحویل بسته به مکان متفاوت است.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>چگونه می‌توانم پرداخت کنم؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>ما روش‌های پرداخت متنوعی را پشتیبانی می‌کنیم از جمله پرداخت آنلاین، پرداخت در محل (برای تهران) و انتقال بانکی.</p>
+        <!-- FAQ Section -->
+        <?php if (!empty($faqs)): ?>
+            <div class="faq-section" style="margin-top: 40px;">
+                <div class="container">
+                    <h2 class="section-title"><i class="fas fa-question-circle"></i> سوالات متداول</h2>
+                    <div class="faq-container">
+                        <?php foreach ($faqs as $faq): ?>
+                            <div class="faq-item">
+                                <div class="faq-question" onclick="toggleFAQ(this)">
+                                    <i class="fas fa-chevron-down"></i>
+                                    <h4><?php echo htmlspecialchars($faq['question']); ?></h4>
+                                </div>
+                                <div class="faq-answer">
+                                    <p><?php echo htmlspecialchars($faq['answer']); ?></p>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>آیا گل‌ها تازه هستند؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>بله، تمام گل‌های ما مستقیماً از گلخانه‌ها و مزارع معتبر تهیه می‌شوند و در سریع‌ترین زمان ممکن به دست شما می‌رسند.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>چگونه از گیاهان مراقبت کنم؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>ما مقالات آموزشی زیادی در سایت داریم که به شما یاد می‌دهند چگونه از گیاهان مختلف مراقبت کنید. همچنین می‌توانید با تیم پشتیبانی ما تماس بگیرید.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <h4>آیا می‌توانم سفارش خود را کنسل کنم؟</h4>
-                    <span class="faq-toggle">+</span>
-                </div>
-                <div class="faq-answer">
-                    <p>بله، شما می‌توانید سفارش خود را تا قبل از ارسال کنسل کنید. برای این کار کافی است با تیم پشتیبانی ما تماس بگیرید.</p>
-                </div>
-            </div>
-        </div>
+        <?php endif; ?>
     </div>
-</section>
+</div>
 
-<!-- Social Media Section -->
-<?php if (!empty($settings['instagram']) || !empty($settings['telegram']) || !empty($settings['whatsapp'])): ?>
-    <section class="section social-section">
-        <div class="container">
-            <div class="section-title">
-                <h2>ما را در شبکه‌های اجتماعی دنبال کنید</h2>
-            </div>
-            
-            <div class="social-grid">
-                <?php if (!empty($settings['instagram'])): ?>
-                    <a href="<?php echo htmlspecialchars($settings['instagram']); ?>" target="_blank" class="social-card">
-                        <div class="social-icon">📸</div>
-                        <span>اینستاگرام</span>
-                    </a>
-                <?php endif; ?>
-                
-                <?php if (!empty($settings['telegram'])): ?>
-                    <a href="<?php echo htmlspecialchars($settings['telegram']); ?>" target="_blank" class="social-card">
-                        <div class="social-icon">💬</div>
-                        <span>تلگرام</span>
-                    </a>
-                <?php endif; ?>
-                
-                <?php if (!empty($settings['whatsapp'])): ?>
-                    <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $settings['whatsapp']); ?>" target="_blank" class="social-card">
-                        <div class="social-icon">🟢</div>
-                        <span>واتساپ</span>
-                    </a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </section>
-<?php endif; ?>
+<script>
+// Toggle FAQ
+function toggleFAQ(element) {
+    const faqItem = element.parentElement;
+    const answer = faqItem.querySelector('.faq-answer');
+    const icon = element.querySelector('i');
+    
+    if (answer.style.display === 'block') {
+        answer.style.display = 'none';
+        icon.classList.remove('fa-chevron-up');
+        icon.classList.add('fa-chevron-down');
+    } else {
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(item => {
+            item.querySelector('.faq-answer').style.display = 'none';
+            item.querySelector('.faq-question i').classList.remove('fa-chevron-up');
+            item.querySelector('.faq-question i').classList.add('fa-chevron-down');
+        });
+        
+        answer.style.display = 'block';
+        icon.classList.remove('fa-chevron-down');
+        icon.classList.add('fa-chevron-up');
+    }
+}
 
-<?php
-require_once "includes/footer.php";
-?>
+// Form validation
+const form = document.querySelector('.contact-form');
+form.addEventListener('submit', function(e) {
+    // Additional client-side validation can be added here
+    return true;
+});
+</script>
+
+<?php require_once 'includes/footer.php'; ?>

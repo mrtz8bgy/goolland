@@ -1,171 +1,224 @@
 <?php
-require_once "includes/header.php";
+session_start();
+require_once 'includes/config.php';
 
-// Get settings
-$settings = [];
-$result = $conn->query("SELECT * FROM settings LIMIT 1");
-if ($result && $result->num_rows > 0) {
-    $settings = $result->fetch_assoc();
-}
+// Get site info
+$siteName = getSetting('site_name', 'گولند');
+$siteDescription = getSetting('site_description', 'فروشگاه آنلاین گل و گیاه با کیفیت بالا');
 
-// Get team members (placeholder - can be added to database)
-$team_members = [
-    ['name' => 'محمد رضا', 'position' => 'بنیانگذار و مدیر', 'image' => null, 'description' => 'بیش از 10 سال تجربه در زمینه کشت و فروش گل و گیاه'],
-    ['name' => 'فاطمه کرمی', 'position' => 'متخصص گیاهان آپارتمانی', 'image' => null, 'description' => 'کارشناس ارشد باغبانی و نگهداری از گیاهان داخلی'],
-    ['name' => 'علی حسینی', 'position' => 'مدیر بازاریابی', 'image' => null, 'description' => 'متخصص در بازاریابی دیجیتال و فروش آنلاین'],
+// Get page content
+$aboutPage = getPageBySlug('about');
+
+// Get testimonials
+$stmt = $pdo->query("SELECT r.*, u.name as user_name FROM reviews r LEFT JOIN users u ON r.user_id = u.id WHERE r.is_approved = 1 AND r.rating >= 4 ORDER BY RAND() LIMIT 6");
+$testimonials = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Get team members (static for now)
+$teamMembers = [
+    [
+        'name' => 'مهدی محمدی',
+        'position' => 'بنیان‌گذار و مدیر عامل',
+        'image' => 'assets/images/team/team1.jpg',
+        'description' => 'بنیان‌گذار گولند با بیش از 15 سال تجربه در صنعت گل و گیاه'
+    ],
+    [
+        'name' => 'fatemeh احمدی',
+        'position' => 'مدیر بازاریابی',
+        'image' => 'assets/images/team/team2.jpg',
+        'description' => 'متخصص در بازاریابی دیجیتال و استراتژی‌های فروش'
+    ],
+    [
+        'name' => 'علی رضا زاده',
+        'position' => 'سرپرست گلخانه',
+        'image' => 'assets/images/team/team3.jpg',
+        'description' => 'متخصص در پرورش گل‌ها و گیاهان آپارتمانی'
+    ],
+    [
+        'name' => 'زهرا کریمی',
+        'position' => 'مشاور مشتریان',
+        'image' => 'assets/images/team/team4.jpg',
+        'description' => 'مشاور ارشد در انتخاب گل‌ها و هدایای مناسب'
+    ]
 ];
 
-// Get statistics
-$products_count = getTableCount('products', "status = 'publish'", $conn);
-$articles_count = getTableCount('articles', "status = 'publish'", $conn);
-$categories_count = getTableCount('categories', "status = 'active'", $conn);
-$orders_count = getTableCount('orders', "status = 'completed'", $conn);
-
+$pageTitle = 'درباره ما';
+$pageDescription = 'درباره فروشگاه آنلاین گل و گیاه گولند';
+require_once 'includes/header.php';
 ?>
 
-<!-- Hero Section -->
-<section class="page-hero">
+<!-- Page Header -->
+<div class="page-header">
     <div class="container">
-        <div class="page-hero-content">
-            <h1>درباره ما</h1>
-            <p>داستان ما در مورد عشق به گل‌ها و گیاهان است</p>
-        </div>
+        <h1>درباره ما</h1>
+        <nav class="breadcrumb">
+            <a href="index.php">خانه</a>
+            <i class="fas fa-chevron-left"></i>
+            <span>درباره ما</span>
+        </nav>
     </div>
-</section>
+</div>
 
-<!-- About Content -->
-<section class="section">
+<!-- About Section -->
+<section class="about-section">
     <div class="container">
-        <div class="about-grid">
-            <!-- About Text -->
-            <div class="about-text">
-                <div class="section-title">
-                    <h2>کی هستیم و چه می‌کنیم؟</h2>
+        <div class="about-container">
+            <!-- About Content -->
+            <div class="about-content">
+                <div class="about-header">
+                    <h2>داستان ما</h2>
+                    <p class="about-subtitle">گولند: جایی که زیبایی با طبیعت ملاقات می‌کند</p>
                 </div>
                 
-                <div class="about-content">
-                    <?php if (!empty($settings['about_text'])): ?>
-                        <p><?php echo nl2br(htmlspecialchars($settings['about_text'])); ?></p>
+                <div class="about-text">
+                    <?php if ($aboutPage && $aboutPage['content']): ?>
+                        <?php echo $aboutPage['content']; ?>
                     <?php else: ?>
                         <p>
-                            در <strong>Goolland</strong>، ما معتقدیم که گل‌ها و گیاهان می‌توانند زندگی را زیباتر، شادتر و سالم‌تر کنند. 
-                            با بیش از 10 سال تجربه در زمینه کشت و فروش گل و گیاه، ما بهترین محصولات را با کیفیت بالا 
-                            و قیمت مناسب به شما ارائه می‌دهیم.
+                            فروشگاه آنلاین گل و گیاه گولند در سال 1395 با هدف ارائه گل‌ها و گیاهان با کیفیت به مشتریان تاسیس شد. 
+                            ما با داشتن گلخانه‌های مدرن و تیم متخصص، محصولات تازه و با کیفیت را در اختیار شما قرار می‌دهیم.
                         </p>
                         <p>
-                            تیم ما متشکل از متخصصین باتجربه در زمینه باغبانی و نگهداری از گیاهان است. ما نه تنها 
-                            محصولات باکیفیت ارائه می‌دهیم، بلکه راهنمایی‌ها و مشاوره‌های تخصصی را نیز در اختیار شما 
-                            قرار می‌دهیم تا بتوانید بهترین انتخاب را داشته باشید.
+                            گولند تنها یک فروشگاه نیست، بلکه تجربه‌ای متفاوت از خرید گل و گیاه است. ما معتقدیم که گل‌ها می‌توانند 
+                            شادی و زیبایی را به زندگی شما بیاورند و لحظه‌های خاص را به یادماندنی‌ترین لحظات تبدیل کنند.
                         </p>
                         <p>
-                            ماموریت ما این است که زیبایی طبیعت را به خانه‌ها، دفاتر و زندگی مردم بیاوریم. ما معتقدیم 
-                            که هر کسی سزاوار داشتن فضای سبز و زیبایی در اطراف خود است.
+                            با بیش از 1000 نوع گل و گیاه مختلف، گولند بزرگ‌ترین مجموعه گل و گیاه در ایران است. ما از گل‌های 
+                            سنتی ایرانی تا گیاهان نادر و خاص را ارائه می‌دهیم تا برای هر سلیقه و هر مناسبت، محصول مناسبی داشته باشیم.
                         </p>
                     <?php endif; ?>
                 </div>
                 
-                <!-- Values -->
-                <div class="about-values">
-                    <h3>ارزش‌های ما</h3>
-                    <div class="values-grid">
-                        <div class="value-item">
-                            <div class="value-icon">🌱</div>
-                            <div class="value-content">
-                                <h4>کیفیت بالا</h4>
-                                <p>ما فقط محصولاتی با بالاترین کیفیت را ارائه می‌دهیم</p>
-                            </div>
+                <!-- Statistics -->
+                <div class="about-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-count="1500">0</span>
+                            <span>+</span>
                         </div>
-                        <div class="value-item">
-                            <div class="value-icon">💚</div>
-                            <div class="value-content">
-                                <h4>عشق به طبیعت</h4>
-                                <p>ما به طبیعت عشق می‌ورزیم و سعی می‌کنیم آن را حفظ کنیم</p>
-                            </div>
+                        <div class="stat-label">محصول مختلف</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-count="5000">0</span>
+                            <span>+</span>
                         </div>
-                        <div class="value-item">
-                            <div class="value-icon">👨‍👩‍👧‍👦</div>
-                            <div class="value-content">
-                                <h4>رضایت مشتری</h4>
-                                <p>رضایت شما برای ما از همه چیز مهم‌تر است</p>
-                            </div>
+                        <div class="stat-label">مشتری راضی</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-count="10">0</span>
+                            <span>+</span>
                         </div>
-                        <div class="value-item">
-                            <div class="value-icon">🚚</div>
-                            <div class="value-content">
-                                <h4>تحویل سریع</h4>
-                                <p>ما سعی می‌کنیم سفارشات شما را در سریع‌ترین زمان تحویل دهیم</p>
-                            </div>
+                        <div class="stat-label">سال تجربه</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">
+                            <span class="counter" data-count="98">0</span>
+                            <span>%</span>
                         </div>
+                        <div class="stat-label">رضایت مشتریان</div>
                     </div>
                 </div>
             </div>
             
             <!-- About Image -->
             <div class="about-image">
-                <div class="image-placeholder">
-                    <?php if (!empty($settings['logo'])): ?>
-                        <img src="/assets/images/<?php echo htmlspecialchars($settings['logo']); ?>" alt="Goolland">
-                    <?php else: ?>
-                        <div class="placeholder-icon">🌿</div>
-                        <span>درباره Goolland</span>
-                    <?php endif; ?>
-                </div>
+                <img src="assets/images/about-us.jpg" alt="درباره گولند">
             </div>
         </div>
     </div>
 </section>
 
-<!-- Statistics -->
-<section class="section stats-section">
+<!-- Why Choose Us Section -->
+<section class="why-choose-us">
     <div class="container">
-        <div class="section-title">
-            <h2>آمار و ارقام</h2>
-            <p>برخی از دستاوردهای ما</p>
+        <div class="section-header">
+            <h2 class="section-title">چرا گولند را انتخاب کنیم؟</h2>
+            <p>ما در گولند تعهد داریم که بهترین تجربه خرید را برای شما فراهم کنیم</p>
         </div>
         
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number"><?php echo number_format($products_count); ?></div>
-                <div class="stat-label">محصول مختلف</div>
+        <div class="why-choose-grid">
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <h3>گل‌های تازه و با کیفیت</h3>
+                <p>تمامی گل‌های ما از گلخانه‌های معتبر تهیه می‌شوند و تا زمان تحویل تازگی خود را حفظ می‌کنند</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number"><?php echo number_format($categories_count); ?></div>
-                <div class="stat-label">دسته‌بندی</div>
+            
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-shipping-fast"></i>
+                </div>
+                <h3>ارسال سریع و مطمئن</h3>
+                <p>با سیستم حمل و نقل پیشرفته، سفارش شما در سریع‌ترین زمان ممکن به دست شما می‌رسد</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number"><?php echo number_format($articles_count); ?></div>
-                <div class="stat-label">مقاله آموزشی</div>
+            
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3>بسته‌بندی ویژه</h3>
+                <p>هر گل با دقت و ظرافت خاصی بسته‌بندی می‌شود تا در طول حمل و نقل آسیب نبینند</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number"><?php echo number_format($orders_count); ?></div>
-                <div class="stat-label">سفارش موفق</div>
+            
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-hand-holding-heart"></i>
+                </div>
+                <h3>خدمات مشتری عالی</h3>
+                <p>تیم پشتیبانی ما در تمام ساعات شبانه‌روز آماده پاسخگویی به سوالات و نیازهای شما است</p>
+            </div>
+            
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <h3>گارانتی رضایت</h3>
+                <p>اگر از خرید خود راضی نبودید، پول شما را برگردانده و محصول را پس می‌گیریم</p>
+            </div>
+            
+            <div class="why-choose-item">
+                <div class="why-choose-icon">
+                    <i class="fas fa-gift"></i>
+                </div>
+                <h3>هدایای ویژه</h3>
+                <p>با خرید از گولند، علاوه بر گل‌های زیبا، هدایای ویژه و کارت‌های تبریک هم دریافت می‌کنید</p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Team Section -->
-<section class="section team-section">
+<section class="team-section">
     <div class="container">
-        <div class="section-title">
-            <h2>تیم ما</h2>
-            <p>با اعضای تیم آشنا شوید</p>
+        <div class="section-header">
+            <h2 class="section-title">تیم حرفه‌ای ما</h2>
+            <p>با تیم متخصص و با تجربه گولند آشنا شوید</p>
         </div>
         
         <div class="team-grid">
-            <?php foreach ($team_members as $member): ?>
-                <div class="team-member">
-                    <div class="member-image">
-                        <?php if ($member['image']): ?>
-                            <img src="/assets/images/<?php echo htmlspecialchars($member['image']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>">
+            <?php foreach ($teamMembers as $member): ?>
+                <div class="team-card">
+                    <div class="team-image">
+                        <?php if (file_exists($member['image'])): ?>
+                            <img src="<?php echo $member['image']; ?>" alt="<?php echo htmlspecialchars($member['name']); ?>">
                         <?php else: ?>
-                            <div class="member-placeholder">👤</div>
+                            <div class="team-placeholder">
+                                <i class="fas fa-user"></i>
+                            </div>
                         <?php endif; ?>
                     </div>
-                    <div class="member-info">
+                    <div class="team-info">
                         <h3><?php echo htmlspecialchars($member['name']); ?></h3>
-                        <p class="member-position"><?php echo htmlspecialchars($member['position']); ?></p>
-                        <p class="member-description"><?php echo htmlspecialchars($member['description']); ?></p>
+                        <p class="team-position"><?php echo htmlspecialchars($member['position']); ?></p>
+                        <p class="team-description"><?php echo htmlspecialchars($member['description']); ?></p>
+                    </div>
+                    <div class="team-social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -173,58 +226,65 @@ $orders_count = getTableCount('orders', "status = 'completed'", $conn);
     </div>
 </section>
 
-<!-- Why Choose Us -->
-<section class="section why-choose-us">
-    <div class="container">
-        <div class="why-grid">
-            <div class="why-image">
-                <div class="image-placeholder">
-                    <div class="placeholder-icon">❓</div>
-                    <span>چرا Goolland؟</span>
-                </div>
+<!-- Testimonials Section -->
+<?php if (!empty($testimonials)): ?>
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">نظرات مشتریان</h2>
+                <p>شما می‌توانید نظرات مشتریان راضی ما را بخوانید</p>
             </div>
-            <div class="why-content">
-                <div class="section-title">
-                    <h2>چرا از Goolland خرید کنیم؟</h2>
-                </div>
-                
-                <div class="why-list">
-                    <div class="why-item">
-                        <div class="why-icon">✅</div>
-                        <div class="why-text">
-                            <h4>محصولات تازه و باکیفیت</h4>
-                            <p>ما محصولات خود را مستقیماً از مزارع و گلخانه‌های معتبر تهیه می‌کنیم</p>
+            
+            <div class="testimonials-grid">
+                <?php foreach ($testimonials as $testimonial): ?>
+                    <div class="testimonial-card">
+                        <div class="testimonial-header">
+                            <div class="testimonial-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="testimonial-author">
+                                <h4><?php echo htmlspecialchars($testimonial['user_name'] ?? 'مشتری'); ?></h4>
+                                <span class="author-role">مشتری</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="why-item">
-                        <div class="why-icon">🌍</div>
-                        <div class="why-text">
-                            <h4>تحویل در سراسر کشور</h4>
-                            <p>ما به تمام شهرهای ایران سرویس‌دهی می‌کنیم</p>
+                        <div class="testimonial-rating">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <i class="fas fa-star <?php echo $i <= $testimonial['rating'] ? 'filled' : ''; ?>"></i>
+                            <?php endfor; ?>
                         </div>
+                        <p class="testimonial-text">
+                            <?php echo htmlspecialchars($testimonial['comment'] ?? $testimonial['title']); ?>
+                        </p>
                     </div>
-                    <div class="why-item">
-                        <div class="why-icon">💰</div>
-                        <div class="why-text">
-                            <h4>قیمت‌های رقابتی</h4>
-                            <p>ما بهترین قیمت‌ها را با بالاترین کیفیت ارائه می‌دهیم</p>
-                        </div>
-                    </div>
-                    <div class="why-item">
-                        <div class="why-icon">🛡️</div>
-                        <div class="why-text">
-                            <h4>ضمانت کیفیت</h4>
-                            <p>اگر از محصول ما راضی نبودید، پول شما را بازگردانیم</p>
-                        </div>
-                    </div>
-                    <div class="why-item">
-                        <div class="why-icon">💬</div>
-                        <div class="why-text">
-                            <h4>پشتیبانی 24/7</h4>
-                            <p>تیم پشتیبانی ما همیشه آماده پاسخگویی به سوال‌های شماست</p>
-                        </div>
-                    </div>
-                </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
+
+<!-- Partners Section -->
+<section class="partners-section">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">همکاران ما</h2>
+            <p>ما با برندها و شرکت‌های معتبر همکاری می‌کنیم</p>
+        </div>
+        
+        <div class="partners-grid">
+            <div class="partner-logo">
+                <img src="assets/images/brands/brand1.png" alt="همکار 1">
+            </div>
+            <div class="partner-logo">
+                <img src="assets/images/brands/brand2.png" alt="همکار 2">
+            </div>
+            <div class="partner-logo">
+                <img src="assets/images/brands/brand3.png" alt="همکار 3">
+            </div>
+            <div class="partner-logo">
+                <img src="assets/images/brands/brand4.png" alt="همکار 4">
+            </div>
+            <div class="partner-logo">
+                <img src="assets/images/brands/brand5.png" alt="همکار 5">
             </div>
         </div>
     </div>
@@ -233,14 +293,18 @@ $orders_count = getTableCount('orders', "status = 'completed'", $conn);
 <!-- CTA Section -->
 <section class="cta-section">
     <div class="container">
-        <div class="cta-content">
-            <h2>آماده‌اید تا سفارش دهید؟</h2>
-            <p>همین امروز از محصولات ما دیدن کنید و سفارش خود را ثبت نمایید</p>
+        <div class="cta-container">
+            <div class="cta-content">
+                <h2>برای خرید گل‌های زیبا و با کیفیت اقدام کنید</h2>
+                <p>گولند با ارائه گل‌ها و گیاهان با کیفیت و خدمات حرفه‌ای، تجربه‌ای متفاوت از خرید آنلاین را برای شما فراهم می‌کند.</p>
+            </div>
             <div class="cta-buttons">
-                <a href="/products.php" class="btn btn-primary">
-                    مشاهده محصولات
+                <a href="products.php" class="btn btn-primary btn-lg">
+                    <i class="fas fa-shopping-bag"></i>
+                    خرید گل
                 </a>
-                <a href="/contact.php" class="btn btn-secondary">
+                <a href="contact.php" class="btn btn-outline-white btn-lg">
+                    <i class="fas fa-envelope"></i>
                     تماس با ما
                 </a>
             </div>
@@ -248,6 +312,41 @@ $orders_count = getTableCount('orders', "status = 'completed'", $conn);
     </div>
 </section>
 
-<?php
-require_once "includes/footer.php";
-?>
+<script>
+// Counter animation
+function animateCounters() {
+    const counters = document.querySelectorAll('.counter');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target;
+                const target = parseInt(counter.dataset.count);
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const updateCounter = () => {
+                    current += step;
+                    if (current < target) {
+                        counter.textContent = Math.floor(current).toLocaleString('fa-IR');
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.textContent = target.toLocaleString('fa-IR');
+                    }
+                };
+                
+                updateCounter();
+                observer.unobserve(counter);
+            }
+        });
+    }, { threshold: 0.5 });
+    
+    counters.forEach(counter => observer.observe(counter));
+}
+
+// Initialize counters
+document.addEventListener('DOMContentLoaded', animateCounters);
+</script>
+
+<?php require_once 'includes/footer.php'; ?>

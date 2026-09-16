@@ -344,7 +344,7 @@ require_once 'header.php';
                     لیست کوپن‌ها (<?php echo toPersianNumbers($totalCoupons); ?>)
                 </div>
                 <div class="table-actions">
-                    <a href="export_coupons.php" class="btn btn-success btn-sm">
+                    <a href="manage_coupons.php" class="btn btn-success btn-sm">
                         <i class="fas fa-file-export"></i> صادر کردن
                     </a>
                 </div>

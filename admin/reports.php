@@ -184,7 +184,7 @@ require_once 'header.php';
         <div class="dashboard-card">
             <div class="card-header">
                 <h3><i class="fas fa-calendar-day"></i> گزارش فروش روزانه</h3>
-                <a href="export_sales.php?start_date=<?php echo $startDate; ?>&end_date=<?php echo $endDate; ?>" class="btn btn-success btn-sm">
+                <a href="reports.php?start_date=<?php echo $startDate; ?>&end_date=<?php echo $endDate; ?>" class="btn btn-success btn-sm">
                     <i class="fas fa-file-export"></i> صادر کردن
                 </a>
             </div>

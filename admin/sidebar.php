@@ -118,7 +118,7 @@ $canManageAdmins = $adminRole === 'admin';
             <?php endif; ?>
 
             <?php if ($canManageSettings): ?>
-            <li class="nav-item <?php echo $currentPage === 'settings.php' || $currentPage === 'shipping.php' || $currentPage === 'payment.php' ? 'active' : ''; ?>">
+            <li class="nav-item <?php echo $currentPage === 'settings.php' ? 'active' : ''; ?>">
                 <a href="settings.php" class="nav-link">
                     <i class="fas fa-cog"></i>
                     <span>تنظیمات سایت</span>

@@ -159,7 +159,7 @@ require_once 'header.php';
     <div class="admin-header">
         <h1><i class="fas fa-users"></i> مدیریت کاربران</h1>
         <div class="admin-actions">
-            <a href="add_user.php" class="btn btn-primary">
+            <a href="manage_users.php" class="btn btn-primary">
                 <i class="fas fa-plus"></i> افزودن کاربر جدید
             </a>
             <a href="dashboard.php" class="btn btn-secondary">
@@ -274,7 +274,7 @@ require_once 'header.php';
                     لیست کاربران (<?php echo toPersianNumbers($totalUsers); ?>)
                 </div>
                 <div class="table-actions">
-                    <a href="export_users.php" class="btn btn-success btn-sm">
+                    <a href="manage_users.php" class="btn btn-success btn-sm">
                         <i class="fas fa-file-export"></i> صادر کردن
                     </a>
                 </div>
@@ -355,12 +355,12 @@ require_once 'header.php';
                                     </td>
                                     <td>
                                         <div class="action-btns">
-                                            <a href="user_details.php?id=<?php echo $user['id']; ?>" 
+                                            <a href="manage_users.php?id=<?php echo $user['id']; ?>"
                                                class="action-btn view" 
                                                title="مشاهده جزئیات">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="edit_user.php?id=<?php echo $user['id']; ?>" 
+                                            <a href="manage_users.php?id=<?php echo $user['id']; ?>"
                                                class="action-btn edit" 
                                                title="ویرایش">
                                                 <i class="fas fa-edit"></i>

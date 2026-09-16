@@ -340,10 +340,10 @@ require_once 'header.php';
                     لیست محصولات (<?php echo toPersianNumbers($totalProducts); ?>)
                 </div>
                 <div class="table-actions">
-                    <a href="import_products.php" class="btn btn-info btn-sm">
+                    <a href="manage_products.php" class="btn btn-info btn-sm">
                         <i class="fas fa-file-import"></i> وارد کردن
                     </a>
-                    <a href="export_products.php" class="btn btn-success btn-sm">
+                    <a href="manage_products.php" class="btn btn-success btn-sm">
                         <i class="fas fa-file-export"></i> صادر کردن
                     </a>
                 </div>
@@ -441,7 +441,7 @@ require_once 'header.php';
                                                title="ویرایش">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <a href="product_gallery.php?id=<?php echo $product['id']; ?>" 
+                                            <a href="edit_product.php?id=<?php echo $product['id']; ?>"
                                                class="action-btn view" 
                                                title="گالری تصاویر">
                                                 <i class="fas fa-images"></i>

@@ -19,6 +19,7 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/admin-manage.css">
     
     <!-- Preload key resources -->
     <link rel="preload" href="assets/css/admin.css" as="style">

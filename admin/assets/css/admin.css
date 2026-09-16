@@ -1065,3 +1065,176 @@ tbody tr:hover {
         padding: 0;
     }
 }
+
+/* =========================================================
+   FINAL LAYOUT NORMALIZATION
+   Shared by dashboard and management pages
+========================================================= */
+
+body {
+    background:
+        radial-gradient(circle at 100% 0, rgba(46, 125, 50, 0.07), transparent 28%),
+        var(--bg-primary);
+}
+
+.admin-container {
+    position: relative;
+    display: block;
+    min-height: 100vh;
+}
+
+.admin-sidebar {
+    right: 0;
+    left: auto;
+    background: linear-gradient(180deg, #173d2a 0%, #10281d 100%);
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-sidebar .logo {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.admin-sidebar .nav-menu a.active,
+.admin-sidebar .nav-menu a:hover {
+    background: rgba(76, 175, 80, 0.18);
+    border-right-color: #81c784;
+}
+
+.admin-main {
+    width: auto;
+    margin-right: 260px;
+    margin-left: 0;
+    padding: 24px;
+    transition: margin-right 0.3s ease;
+}
+
+.admin-main.expanded {
+    margin-right: 70px;
+}
+
+.admin-content {
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.admin-header {
+    min-height: 58px;
+    margin-bottom: 24px;
+    padding: 0 0 16px;
+    border-bottom-color: rgba(46, 125, 50, 0.16);
+}
+
+.dashboard-content-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-card,
+.chart-card,
+.stat-card,
+.product-form-container,
+.category-form-container,
+.user-form-container,
+.settings-container,
+.products-table-container,
+.categories-table-container,
+.users-table-container,
+.orders-table-container,
+.order-details-container {
+    border-color: rgba(46, 125, 50, 0.14);
+    box-shadow: 0 8px 24px rgba(24, 52, 37, 0.07);
+}
+
+.dashboard-card {
+    min-width: 0;
+}
+
+.admin-footer {
+    margin-right: 260px;
+    padding: 22px 24px;
+    background: #10281d;
+    color: rgba(255, 255, 255, 0.75);
+    transition: margin-right 0.3s ease;
+}
+
+.admin-footer .container {
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.admin-footer .footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.admin-footer p {
+    margin: 0;
+    color: inherit;
+    font-size: 13px;
+}
+
+.admin-footer a {
+    color: #a5d6a7;
+}
+
+@media (min-width: 1025px) {
+    .admin-sidebar.collapsed + .admin-main {
+        margin-right: 70px;
+    }
+
+    .admin-sidebar.collapsed ~ .admin-footer {
+        margin-right: 70px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .admin-container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        max-height: none;
+    }
+
+    .admin-main,
+    .admin-main.expanded,
+    .admin-footer {
+        margin-right: 0;
+    }
+
+    .admin-main {
+        padding: 20px;
+    }
+
+    .admin-sidebar .nav-menu {
+        padding: 0 12px 12px;
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-content-row {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-main {
+        padding: 16px;
+    }
+
+    .admin-footer {
+        padding: 18px 16px;
+    }
+
+    .admin-footer .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+}

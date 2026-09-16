@@ -386,7 +386,7 @@ require_once 'header.php';
                     لیست سفارش‌ها (<?php echo toPersianNumbers($totalOrders); ?>)
                 </div>
                 <div class="table-actions">
-                    <a href="export_orders.php" class="btn btn-success btn-sm">
+                    <a href="manage_orders.php" class="btn btn-success btn-sm">
                         <i class="fas fa-file-export"></i> صادر کردن
                     </a>
                 </div>
@@ -454,7 +454,7 @@ require_once 'header.php';
                                                title="مشاهده جزئیات">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="order_edit.php?id=<?php echo $order['id']; ?>" 
+                                            <a href="order_details.php?id=<?php echo $order['id']; ?>"
                                                class="action-btn edit" 
                                                title="ویرایش">
                                                 <i class="fas fa-edit"></i>

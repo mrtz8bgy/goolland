@@ -1,6 +1,5 @@
 <?php
-session_start();
-require_once 'includes/config.php';
+require_once 'includes/db.php';
 
 // Get site settings
 $site_name = getSetting('site_name', 'گولند - فروشگاه گل و گیاه');

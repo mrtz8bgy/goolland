@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'includes/config.php';
+require_once 'includes/db.php';
 
 // Get product ID
 $productId = isset($_GET['id']) ? intval($_GET['id']) : 0;

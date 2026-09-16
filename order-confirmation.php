@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'includes/config.php';
+require_once 'includes/db.php';
 
 // Redirect to login if not logged in
 if (!isLoggedIn()) {
@@ -9,7 +9,7 @@ if (!isLoggedIn()) {
 }
 
 // Get order ID
-$orderId = isset($_GET['order_id']) ? intval($_GET['order_id']) : 0;
+$orderId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // Get order details
 $order = getOrderDetails($orderId, getCurrentUserId());
@@ -347,7 +347,7 @@ require_once 'includes/header.php';
                         مشاهده سفارشات
                     </a>
                     
-                    <a href="order-tracking.php?order_id=<?php echo $order['id']; ?>" class="btn btn-secondary btn-block">
+                    <a href="order-tracking.php?id=<?php echo $order['id']; ?>" class="btn btn-secondary btn-block">
                         <i class="fas fa-map-marker-alt"></i>
                         پیگیری سفارش
                     </a>

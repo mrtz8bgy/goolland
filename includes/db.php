@@ -16,45 +16,49 @@ $dbname = 'goolland';
 $username = 'root';
 $password = '';
 
-// Establish PDO database connection
-try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
-    
-    // Set PDO attributes
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-    
-    // Set time zone
-    $pdo->exec("SET time_zone = '+03:30'"); // Iran Time Zone
-    
-} catch (PDOException $e) {
-    // Log error to file
-    error_log("Database Connection Error: " . $e->getMessage());
-    
-    // Display user-friendly error
-    die("خطا در اتصال به سرور. لطفاً بعداً دوباره امتحان کنید.");
+// Establish PDO database connection only if not already set
+if (!isset($pdo) || !$pdo instanceof PDO) {
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+        
+        // Set PDO attributes
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        
+        // Set time zone
+        $pdo->exec("SET time_zone = '+03:30'"); // Iran Time Zone
+        
+    } catch (PDOException $e) {
+        // Log error to file
+        error_log("Database Connection Error: " . $e->getMessage());
+        
+        // Display user-friendly error
+        die("خطا در اتصال به سرور. لطفاً بعداً دوباره امتحان کنید.");
+    }
 }
 
 // Also create mysqli connection for compatibility
-try {
-    $conn = new mysqli($host, $username, $password, $dbname);
-    
-    // Check connection
-    if ($conn->connect_error) {
-        throw new Exception("Database connection failed: " . $conn->connect_error);
+if (!isset($conn) || !$conn instanceof mysqli) {
+    try {
+        $conn = new mysqli($host, $username, $password, $dbname);
+        
+        // Check connection
+        if ($conn->connect_error) {
+            throw new Exception("Database connection failed: " . $conn->connect_error);
+        }
+        
+        // Set charset to utf8mb4 for full Unicode support
+        if (!$conn->set_charset("utf8mb4")) {
+            error_log("Error setting charset: " . $conn->error);
+        }
+        
+        // Set time zone
+        $conn->query("SET time_zone = '+03:30'");
+        
+    } catch (Exception $e) {
+        error_log("Database Connection Error (mysqli): " . $e->getMessage());
     }
-    
-    // Set charset to utf8mb4 for full Unicode support
-    if (!$conn->set_charset("utf8mb4")) {
-        error_log("Error setting charset: " . $conn->error);
-    }
-    
-    // Set time zone
-    $conn->query("SET time_zone = '+03:30'");
-    
-} catch (Exception $e) {
-    error_log("Database Connection Error (mysqli): " . $e->getMessage());
 }
 
 /**
@@ -77,7 +81,7 @@ function sanitizeMySQLi($data, $connection) {
 }
 
 /**
- * Sanitize input for PDO (use prepared statements instead)
+ * Sanitize input for general use (not for SQL)
  */
 function sanitizeInput($data) {
     if (is_array($data)) {
@@ -190,3 +194,6 @@ register_shutdown_function(function() {
         $conn->close();
     }
 });
+
+// Include helper functions
+require_once __DIR__ . '/functions.php';

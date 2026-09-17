@@ -1,6 +1,10 @@
 <?php
 require_once 'includes/db.php';
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 // Get site settings
 $site_name = getSetting('site_name', 'گولند - فروشگاه گل و گیاه');
 $site_description = getSetting('site_description', 'فروشگاه آنلاین گل و گیاه با کیفیت بالا');

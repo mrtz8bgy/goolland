@@ -23,7 +23,7 @@ $canManageAdmins = $adminRole === 'admin';
     <div class="sidebar-header">
         <div class="logo">
             <i class="fas fa-leaf"></i>
-            <span class="logo-text">گولند</span>
+            <span class="logo-text">Goolland</span>
         </div>
         <button class="sidebar-toggle" title="بستن منو">
             <i class="fas fa-times"></i>

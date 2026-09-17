@@ -5,7 +5,7 @@ if (!defined('ROOT_PATH')) {
 require_once ROOT_PATH . '/includes/config.php';
 
 // Get site settings
-$siteName = getSetting('site_name', 'گولند - فروشگاه گل و گیاه');
+$siteName = getSetting('site_name', 'goolland - فروشگاه گل و گیاه');
 $siteDescription = getSetting('site_description', 'فروشگاه آنلاین گل و گیاه با کیفیت بالا');
 $siteLogo = getSetting('site_logo', 'assets/images/logo.png');
 $siteFavicon = getSetting('site_favicon', 'assets/images/favicon.ico');
